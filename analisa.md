@@ -5,8 +5,10 @@
 2. [Entity Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
 3. [Analisis Entitas](#analisis-entitas)
 4. [Analisis Relasi](#analisis-relasi)
-5. [Fitur-fitur Utama](#fitur-fitur-utama)
-6. [Kesimpulan](#kesimpulan)
+5. [Analisis User Management dan Akses](#analisis-user-management-dan-akses)
+6. [Data Flow Diagram (DFD)](#data-flow-diagram-dfd)
+7. [Fitur-fitur Utama](#fitur-fitur-utama)
+8. [Kesimpulan](#kesimpulan)
 
 ## Gambaran Umum Sistem
 
@@ -206,6 +208,214 @@ Entitas yang merepresentasikan notifikasi dalam sistem.
 - **Composite Unique Constraints**: (krs_id, pertemuan_ke) di Presensi untuk mencegah duplikasi presensi
 - **Check Constraints**: Status (pending/disetujui/ditolak), jenis_kelamin (L/P), hari (Senin-Sabtu), nilai (A-E)
 
+## Analisis User Management dan Akses
+
+### Arsitektur Otentikasi
+Sistem SIMKuliah menggunakan sistem otentikasi bawaan Django yang terintegrasi dengan model pengguna kustom. Arsitektur ini terdiri dari:
+
+1. **Django User Model (Bawaan)**: Menyediakan otentikasi dasar termasuk username, password, dan email
+2. **Mahasiswa Model**: Terhubung satu-ke-satu dengan User model, memberikan informasi akademik dan pribadi mahasiswa
+3. **Dosen Model**: Terhubung satu-ke-satu dengan User model, memberikan informasi profesional dosen
+
+### Sistem Role-Based Access Control (RBAC)
+Sistem menyediakan dua role utama dengan akses berbeda:
+
+#### 1. Mahasiswa
+**Hak Akses:**
+- Melihat dashboard pribadi
+- Mengelola Kartu Rencana Studi (KRS)
+  - Melihat kelas tersedia
+  - Mendaftar ke kelas (status pending)
+  - Menghapus pendaftaran sebelum disetujui
+- Melihat Kartu Hasil Studi (KHS)
+- Melihat jadwal kuliah
+- Melihat riwayat presensi
+- Melihat dan mengedit biodata pribadi
+- Mengakses notifikasi
+
+**Fungsi yang Dibatasi:**
+- Tidak dapat menghapus KRS yang sudah disetujui
+- Tidak dapat mengakses data mahasiswa lain
+- Tidak dapat menginput nilai atau presensi
+
+#### 2. Dosen
+**Hak Akses:**
+- Melihat dashboard pribadi
+- Melihat dan mengelola kelas yang diajarkan
+- Melihat daftar mahasiswa dalam kelas
+- Menginput nilai mahasiswa
+- Menginput presensi mahasiswa
+- Menyetujui atau menolak permintaan KRS mahasiswa
+- Melihat dan mengedit biodata pribadi
+- Mengakses notifikasi terkait kelasnya
+
+**Fungsi yang Dibatasi:**
+- Hanya dapat mengakses data mahasiswa di kelasnya
+- Tidak dapat mengakses kelas yang tidak diajarnya
+- Tidak dapat mengubah informasi administratif sistem
+
+### Implementasi Otentikasi dan Otorisasi di Kode
+
+#### Fungsi Login Kustom (`academic/views.py`)
+```python
+def custom_login(request):
+    # Sistem login kustom yang secara otomatis mengarahkan 
+    # pengguna ke dashboard sesuai dengan perannya
+```
+
+#### Decorator Akses (`@login_required`)
+Semua view di aplikasi dilindungi dengan dekorator `@login_required` untuk memastikan hanya pengguna terotentikasi yang dapat mengakses.
+
+#### Pemeriksaan Role di View
+Setiap view memverifikasi peran pengguna:
+```python
+try:
+    mahasiswa = Mahasiswa.objects.get(user=request.user)
+except Mahasiswa.DoesNotExist:
+    messages.error(request, 'Anda belum terdaftar sebagai mahasiswa.')
+    return redirect('home')
+```
+
+### Sistem Notifikasi Berdasarkan Role
+- Mahasiswa menerima notifikasi tentang status KRS mereka
+- Dosen menerima notifikasi tentang permintaan KRS yang perlu disetujui
+- Sistem memastikan bahwa notifikasi hanya dikirim ke pihak yang relevan
+
+## Data Flow Diagram (DFD)
+
+### Level 0 - Diagram Konteks
+```
+                    [Sistem SIMKuliah]
+                         |
+    Mahasiswa <---> [Sistem Informasi Akademik] <---> Dosen
+         |                                          |
+         |                                          |
+         V                                          V
+    Basis Data                                  Basis Data
+    Mahasiswa                                  Dosen
+```
+
+### Level 1 - Data Flow Diagram Utama
+
+```
+    +----------------+     Daftar Kelas     +--------------------+
+    |   Mahasiswa    |<---------------------|  Manajemen Kelas   |
+    +----------------+                      +--------------------+
+            |                                        |
+            | Pilih Kelas                            | Jadwal Kelas
+            |--------------------------------------->|----------------+
+            |                                        |                |
+            | KRS Baru                               V                |
+    +----------------+                      +--------------------+    |
+    |               |<---------------------| Manajemen KRS      |    |
+    |   Sistem      |                      |                    |    |
+    |               |--------------------->| - Validasi Kuota   |    |
+    +----------------+  Persetujuan KRS    | - Status Approval  |    |
+            |                              +--------------------+    |
+            | Notifikasi                               |                |
+            |<-----------------------------------------+                |
+            |                                                          |
+            | Persetujuan/Reject                                       |
+            V                                                          |
+    +----------------+     Input Nilai/Presensi   +--------------------+
+    |    Dosen       |<---------------------------| Manajemen Nilai &  |
+    +----------------+                            | Presensi           |
+                                                  +--------------------+
+                                                         |
+                                                         | Update Nilai
+                                                         | Presensi
+                                                         V
+                                                +--------------------+
+                                                |  Basis Data SQL    |
+                                                | - User             |
+                                                | - Mahasiswa        |
+                                                | - Dosen            |
+                                                | - Mata Kuliah      |
+                                                | - Kelas            |
+                                                | - KRS              |
+                                                | - Nilai            |
+                                                | - Presensi         |
+                                                | - Jadwal           |
+                                                +--------------------+
+```
+
+### Level 2 - DFD Proses Utama
+
+#### 2.1 Proses Manajemen User dan Otentikasi
+```
++----------------+     Username/     +------------------+
+| User (Mahasiswa|------------------>|  Otentikasi &    |
+| atau Dosen)    |   Password        | Otorisasi        |
++----------------+                   +------------------+
+       |                                     |
+       |<-------------- Validasi ----------- | 
+       |                                     |
+       |<-------------- Session ------------ | 
+       V                                     V
++----------------+                   +------------------+
+|  Redirect ke   |------------------>| Akses Berdasarkan|
+| Dashboard      |   Role User       | Role & Hak Akses |
++----------------+                   +------------------+
+```
+
+#### 2.2 Proses Manajemen KRS
+```
++---------------+    Pendaftaran KRS   +------------------+
+| Mahasiswa     |--------------------->| Validasi &       |
+|               |                      | Penyimpanan KRS  |
+| - NIM         |                      +------------------+
+| - Pilihan MK  |                              |
++---------------+                              |
+                                               | Status: Pending
++---------------+    Approval/Reject           |
+| Dosen         |<----------------------------|
+|               |     Persetujuan KRS         |
+| - Persetujuan |                             |
+| - Penolakan   |                             |
++---------------+                             |
+       |                                      |
+       | Notifikasi                           |
+       V                                      V
++---------------+                      +------------------+
+| Mahasiswa     |<---------------------| Update Status    |
+| - Notifikasi  |   Status KRS         | KRS              |
+| - Update UI   |                      +------------------+
++---------------+                             |
+                                             |
+                                             V
+                                     +------------------+
+                                     | Basis Data KRS   |
+                                     | - Mahasiswa_ID   |
+                                     | - Kelas_ID       |
+                                     | - Status         |
+                                     +------------------+
+```
+
+#### 2.3 Proses Manajemen Nilai dan Presensi
+```
++---------------+    Data Presensi/   +------------------+
+| Dosen         |---- Nilai --------->| Penyimpanan &    |
+|               |                      | Validasi Data    |
+| - Input Data  |                      +------------------+
+| - Pemilihan   |                              |
+|   Mahasiswa   |                              |
++---------------+                              |
+                                              |
++---------------+                             |
+| Sistem        |<----------------------------
+| - Notifikasi  |    Update Data
+| - Laporan     |   
++---------------+
+```
+
+### Aliran Data Utama
+
+1. **Aliran Otentikasi**: User → Credentials → Sistem → Role Verification → Dashboard Access
+2. **Aliran Pendaftaran KRS**: Mahasiswa → Kelas Selection → Approval System → Dosen → Status Update
+3. **Aliran Penilaian**: Dosen → Nilai Input → Database Update → Mahasiswa Notification
+4. **Aliran Presensi**: Dosen → Presensi Input → Database Update → Mahasiswa Record
+5. **Aliran Notifikasi**: Sistem → Event Trigger → Notification System → User Dashboard
+
 ## Fitur-fitur Utama
 
 ### 1. Sistem Otorisasi Role-based
@@ -243,5 +453,9 @@ Entitas yang merepresentasikan notifikasi dalam sistem.
 Desain database SIMKuliah merepresentasikan sistem informasi akademik yang komprehensif dengan struktur relasional yang baik. Skema ini mendukung semua fungsi akademik utama termasuk manajemen mahasiswa, dosen, pendaftaran mata kuliah, penilaian, dan presensi. 
 
 Desain ini menunjukkan prinsip-prinsip basis data relasional yang baik dengan normalisasi yang meminimalkan redundansi data. Relasi antar entitas telah ditentukan dengan tepat untuk mendukung kompleksitas operasi akademik. Sistem persetujuan KRS menambahkan fitur administratif penting, sementara sistem notifikasi memastikan alur informasi yang efektif.
+
+Sistem manajemen pengguna yang dirancang dengan baik memberikan akses yang sesuai berdasarkan peran (mahasiswa atau dosen) sambil menjaga keamanan data dan privasi informasi akademik. Arsitektur role-based access control (RBAC) memastikan bahwa pengguna hanya dapat mengakses dan memanipulasi data yang relevan dengan perannya.
+
+Data Flow Diagram menunjukkan alur informasi yang efisien dalam sistem, dari otentikasi pengguna hingga proses akademik seperti pendaftaran matakuliah, penilaian, dan presensi. Sistem ini dirancang untuk mendukung proses akademik yang terstruktur dengan workflow yang jelas antara mahasiswa dan dosen.
 
 Skema database ini siap untuk mendukung institusi pendidikan dengan berbagai program studi, mata kuliah, dan pengguna dalam jumlah besar. Integrasi dengan sistem AI Gemini juga memberikan kemudahan dalam pengembangan dan pengelolaan sistem secara keseluruhan.
