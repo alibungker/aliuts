@@ -1,0 +1,728 @@
+/* ===== Modern Admin Theme ===== */
+
+/* Color Palette */
+:root {
+    --primary: #667eea;
+    --primary-dark: #5568d3;
+    --primary-light: #8b9df8;
+    --accent: #764ba2;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #e5e7eb;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Global Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Header */
+#header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: none !important;
+    padding: 0 !important;
+    height: 80px !important;
+}
+
+#branding {
+    display: flex !important;
+    align-items: center !important;
+    height: 80px !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+#branding h1 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+#branding h1 a {
+    color: white !important;
+    text-decoration: none !important;
+}
+
+#user-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 0 24px !important;
+    height: 80px !important;
+    color: white !important;
+    font-size: 14px !important;
+}
+
+#user-tools a {
+    color: white !important;
+    text-decoration: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+}
+
+#user-tools a:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    transform: scale(1.05) !important;
+}
+
+.theme-toggle svg {
+    width: 20px !important;
+    height: 20px !important;
+    fill: white !important;
+    stroke: white !important;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    background: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 16px 32px !important;
+    font-size: 14px !important;
+    color: var(--text-secondary) !important;
+}
+
+.breadcrumbs a {
+    color: var(--primary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--primary-dark) !important;
+    text-decoration: underline !important;
+}
+
+/* Content Container */
+#content {
+    padding: 32px !important;
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+}
+
+#content-main {
+    margin: 0 !important;
+}
+
+/* Content Header */
+#content h1 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 24px !important;
+}
+
+/* Modules / Cards */
+.module {
+    background: var(--bg-primary) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow) !important;
+    border: 1px solid var(--border) !important;
+    margin-bottom: 24px !important;
+    overflow: hidden !important;
+}
+
+.module h2,
+.module caption {
+    background: linear-gradient(to bottom, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+    color: var(--text-primary) !important;
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid var(--border) !important;
+    margin: 0 !important;
+}
+
+/* Tables */
+table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+thead th {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 12px 16px !important;
+    text-align: left !important;
+    border-bottom: 2px solid var(--border) !important;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--border) !important;
+    transition: background 0.15s ease !important;
+}
+
+tbody tr:hover {
+    background: var(--bg-secondary) !important;
+}
+
+tbody td {
+    padding: 14px 16px !important;
+    color: var(--text-primary) !important;
+}
+
+tbody th {
+    padding: 14px 16px !important;
+    font-weight: 500 !important;
+}
+
+/* Result List */
+#result_list {
+    border: none !important;
+}
+
+#changelist {
+    background: var(--bg-primary) !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    box-shadow: var(--shadow) !important;
+    border: 1px solid var(--border) !important;
+}
+
+#changelist-form .results {
+    overflow-x: auto !important;
+}
+
+/* Action Checkboxes */
+.action-checkbox {
+    padding: 14px 16px !important;
+}
+
+/* Buttons */
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input,
+button {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover,
+.submit-row input:hover,
+button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+.button:active,
+input[type=submit]:active,
+input[type=button]:active,
+button:active {
+    transform: translateY(0) !important;
+}
+
+.button.default,
+input[type=submit].default {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+}
+
+.deletelink,
+.deletelink-box {
+    background: var(--danger) !important;
+}
+
+.deletelink:hover,
+.deletelink-box:hover {
+    background: #dc2626 !important;
+}
+
+/* Add/Change Links */
+.addlink,
+.changelink,
+.viewlink {
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.addlink {
+    color: var(--success) !important;
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.addlink:hover {
+    background: rgba(16, 185, 129, 0.2) !important;
+}
+
+.changelink {
+    color: var(--info) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.changelink:hover {
+    background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Forms */
+.form-row {
+    padding: 20px 24px !important;
+    border-bottom: 1px solid var(--border) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
+.form-row:last-child {
+    border-bottom: none !important;
+}
+
+.form-row label {
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    background: var(--bg-primary) !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+    max-width: 600px !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    outline: none !important;
+}
+
+/* Dashboard Styles */
+#content-main {
+    width: 100% !important;
+}
+
+.dashboard .module table {
+    border-collapse: collapse !important;
+}
+
+.dashboard .module th,
+.dashboard .module td {
+    border: none !important;
+}
+
+.dashboard .module tr {
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.dashboard .module tr:last-child {
+    border-bottom: none !important;
+}
+
+.dashboard .module a {
+    display: flex !important;
+    padding: 14px 20px !important;
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.dashboard .module a:hover {
+    background: var(--bg-secondary) !important;
+    color: var(--primary) !important;
+}
+
+/* Messages */
+.messagelist {
+    padding: 0 !important;
+    margin: 0 0 24px 0 !important;
+    list-style: none !important;
+}
+
+.messagelist li {
+    padding: 16px 20px !important;
+    margin-bottom: 12px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    border-left: 4px solid !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.messagelist .success {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #065f46 !important;
+    border-left-color: var(--success) !important;
+}
+
+.messagelist .error {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #991b1b !important;
+    border-left-color: var(--danger) !important;
+}
+
+.messagelist .warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #92400e !important;
+    border-left-color: var(--warning) !important;
+}
+
+.messagelist .info {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #1e40af !important;
+    border-left-color: var(--info) !important;
+}
+
+/* Filters */
+#changelist-filter {
+    background: var(--bg-primary) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+#changelist-filter h2 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 16px !important;
+    color: var(--text-primary) !important;
+}
+
+#changelist-filter h3 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin: 16px 0 8px 0 !important;
+    color: var(--text-secondary) !important;
+}
+
+#changelist-filter ul {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#changelist-filter li {
+    list-style: none !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    margin-bottom: 4px !important;
+}
+
+#changelist-filter li:hover {
+    background: var(--bg-secondary) !important;
+}
+
+#changelist-filter a {
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
+    display: block !important;
+}
+
+#changelist-filter a:hover {
+    color: var(--primary) !important;
+}
+
+#changelist-filter li.selected a {
+    color: var(--primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Search */
+#changelist-search {
+    margin-bottom: 24px !important;
+}
+
+#searchbar {
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    max-width: 400px !important;
+}
+
+#searchbar:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    outline: none !important;
+}
+
+/* Pagination */
+.pagination {
+    background: var(--bg-primary) !important;
+    padding: 16px 20px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+.pagination a,
+.pagination span {
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.pagination a:hover {
+    background: var(--bg-secondary) !important;
+    color: var(--primary) !important;
+}
+
+.pagination .this-page {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+/* Submit Row */
+.submit-row {
+    background: var(--bg-tertiary) !important;
+    padding: 20px 24px !important;
+    border-top: 1px solid var(--border) !important;
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+
+/* Help Text */
+.help {
+    font-size: 13px !important;
+    color: var(--text-secondary) !important;
+    font-style: italic !important;
+    margin-top: 4px !important;
+}
+
+/* Errors */
+.errorlist {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #991b1b !important;
+    border: 1px solid var(--danger) !important;
+    border-radius: 6px !important;
+    padding: 12px 16px !important;
+    margin: 8px 0 !important;
+    list-style: none !important;
+}
+
+.errorlist li {
+    margin-bottom: 4px !important;
+}
+
+.errorlist li:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #content {
+        padding: 16px !important;
+    }
+    
+    .form-row {
+        padding: 16px !important;
+    }
+    
+    #user-tools {
+        font-size: 12px !important;
+        gap: 8px !important;
+    }
+}
+
+/* Action Bar */
+.actions {
+    background: var(--bg-primary) !important;
+    padding: 16px 20px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    margin-bottom: 16px !important;
+}
+
+.actions label {
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+}
+
+.actions select {
+    border: 2px solid var(--border) !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    margin: 0 8px !important;
+}
+
+/* Object Tools */
+.object-tools {
+    float: right !important;
+    margin-top: -52px !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.object-tools li {
+    list-style: none !important;
+    display: inline-block !important;
+    margin-left: 8px !important;
+}
+
+.object-tools a {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all 0.2s ease !important;
+}
+
+.object-tools a:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+/* Clear float */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 4px !important;
+}
+
+input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    border-color: #667eea !important;
+}
+
+.action-checkbox {
+    width: 50px !important;
+    text-align: center !important;
+}
+
+/* Row Selection */
+#result_list tbody tr.selected {
+    background: rgba(102, 126, 234, 0.05) !important;
+}
+
+/* Date Hierarchy */
+.xfull {
+    background: white !important;
+    padding: 16px 24px !important;
+    border-radius: 12px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.xfull a {
+    color: #667eea !important;
+    text-decoration: none !important;
+    padding: 8px 14px !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+}
+
+.xfull a:hover {
+    background: #f3f4f6 !important;
+}
+
+.xfull a.active {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+}

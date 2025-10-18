@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m pip:*)",
+      "Bash(python3:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(./venv/bin/pip install:*)",
+      "Bash(./venv/bin/gunicorn:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Read(//home/aliuts/htdocs/**)",
+      "Read(//etc/nginx/sites-enabled/**)",
+      "Read(//etc/nginx/ssl-certificates/**)",
+      "Bash(openssl x509:*)",
+      "Bash(/home/aliuts/htdocs/aliuts.bungker.co.id/venv/bin/gunicorn:*)",
+      "Bash(source venv/bin/activate)",
+      "Bash(python manage.py shell:*)",
+      "Read(//home/aliuts/logs/nginx/**)",
+      "Bash(python manage.py collectstatic:*)",
+      "Bash(python manage.py check:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(DJANGO_SETTINGS_MODULE=sip_kuliah.settings python:*)",
+      "Bash(mkdir:*)",
+      "Bash(awk:*)",
+      "Bash(xargs kill:*)",
+      "Bash(gunicorn:*)",
+      "Bash(find:*)",
+      "Bash(/home/aliuts/htdocs/aliuts.bungker.co.id/venv/bin/python:*)",
+      "Bash(xargs:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,175 @@
+{% extends 'academic/base.html' %}
+
+{% block title %}KHS - Kartu Hasil Studi{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { background: linear-gradient(135deg, #30d158 0%, #30e158 100%); color: white; padding: 60px 0; margin: -40px 0 40px 0; border-radius: 0 0 40px 40px; box-shadow: 0 10px 40px rgba(48, 209, 88, 0.3); }
+    .page-header h1 { font-size: 42px; font-weight: 600; margin-bottom: 10px; }
+    .page-header p { font-size: 19px; opacity: 0.9; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 16px; margin-bottom: 20px; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 980px; transition: all 0.3s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.3); }
+    .ipk-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .ipk-card { background: white; padding: 32px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); text-align: center; position: relative; overflow: hidden; }
+    .ipk-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #30d158, #30e158); }
+    .ipk-card.blue::before { background: linear-gradient(90deg, #0071e3, #0077ed); }
+    .ipk-label { font-size: 14px; color: #6e6e73; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ipk-value { font-size: 56px; font-weight: 700; color: #30d158; margin-bottom: 8px; line-height: 1; }
+    .ipk-card.blue .ipk-value { color: #0071e3; }
+    .ipk-description { font-size: 14px; color: #86868b; }
+    .section-card { background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 32px; overflow: hidden; }
+    .section-header { background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); padding: 24px; border-bottom: 1px solid #d2d2d7; }
+    .section-header h2 { font-size: 22px; font-weight: 600; color: #1d1d1f; margin: 0; }
+    .section-header p { font-size: 15px; color: #6e6e73; margin: 8px 0 0 0; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #fbfbfd; }
+    thead th { padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f5f5f7; }
+    tbody tr { transition: background 0.2s ease; border-bottom: 1px solid #f5f5f7; }
+    tbody tr:hover { background: #fbfbfd; }
+    tbody td { padding: 20px 24px; font-size: 15px; color: #1d1d1f; }
+    .kode-mk { font-weight: 600; color: #30d158; font-family: 'SF Mono', Monaco, monospace; }
+    .nilai-badge { display: inline-block; padding: 6px 16px; border-radius: 12px; font-size: 15px; font-weight: 700; min-width: 50px; text-align: center; }
+    .nilai-a { background: #d1f4e0; color: #1d8348; }
+    .nilai-b { background: #d1e7ff; color: #004085; }
+    .nilai-c { background: #fff4e0; color: #856404; }
+    .nilai-d { background: #ffe0e0; color: #721c24; }
+    .nilai-e { background: #f5f5f7; color: #6e6e73; }
+    .empty-state { text-align: center; padding: 60px 40px; }
+    .empty-icon { width: 100px; height: 100px; background: #f5f5f7; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .empty-icon svg { width: 56px; height: 56px; stroke: #86868b; fill: none; stroke-width: 2; }
+    @media (max-width: 768px) { .ipk-section { grid-template-columns: 1fr; } table { font-size: 14px; } thead th, tbody td { padding: 12px 16px; } }
+</style>
+
+<div class="page-header">
+    <div class="container">
+        <a href="{% url 'mahasiswa_dashboard' %}" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+            </svg>
+            Kembali
+        </a>
+        <h1>Kartu Hasil Studi (KHS)</h1>
+        <p>{{ mahasiswa.nim }} • {{ mahasiswa.program_studi.nama_prodi }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- IPK Section -->
+    <div class="ipk-section">
+        <div class="ipk-card">
+            <div class="ipk-label">IPS Semester Ini</div>
+            <div class="ipk-value">{{ ips|default:"0.00" }}</div>
+            <div class="ipk-description">Indeks Prestasi Semester</div>
+        </div>
+        <div class="ipk-card blue">
+            <div class="ipk-label">IPK Kumulatif</div>
+            <div class="ipk-value">{{ ipk|default:"0.00" }}</div>
+            <div class="ipk-description">Indeks Prestasi Kumulatif</div>
+        </div>
+    </div>
+
+    <!-- Daftar Nilai -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>Daftar Nilai</h2>
+            <p>Hasil studi semester aktif</p>
+        </div>
+
+        {% if krs_list %}
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode</th>
+                    <th>Mata Kuliah</th>
+                    <th>SKS</th>
+                    <th>Dosen</th>
+                    <th>Nilai Angka</th>
+                    <th>Nilai Huruf</th>
+                    <th>Bobot</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for krs in krs_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="kode-mk">{{ krs.kelas.mata_kuliah.kode_mk }}</td>
+                    <td>{{ krs.kelas.mata_kuliah.nama_mk }}</td>
+                    <td>{{ krs.kelas.mata_kuliah.sks }}</td>
+                    <td>{{ krs.kelas.dosen.nama }}</td>
+                    <td>
+                        {% if krs.nilai %}
+                            {{ krs.nilai.nilai_angka|default:"-" }}
+                        {% else %}
+                            <span style="color: #86868b;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if krs.nilai and krs.nilai.nilai_huruf %}
+                            {% if krs.nilai.nilai_huruf == 'A' or krs.nilai.nilai_huruf == 'A-' %}
+                                <span class="nilai-badge nilai-a">{{ krs.nilai.nilai_huruf }}</span>
+                            {% elif krs.nilai.nilai_huruf == 'B+' or krs.nilai.nilai_huruf == 'B' or krs.nilai.nilai_huruf == 'B-' %}
+                                <span class="nilai-badge nilai-b">{{ krs.nilai.nilai_huruf }}</span>
+                            {% elif krs.nilai.nilai_huruf == 'C+' or krs.nilai.nilai_huruf == 'C' %}
+                                <span class="nilai-badge nilai-c">{{ krs.nilai.nilai_huruf }}</span>
+                            {% elif krs.nilai.nilai_huruf == 'D' %}
+                                <span class="nilai-badge nilai-d">{{ krs.nilai.nilai_huruf }}</span>
+                            {% else %}
+                                <span class="nilai-badge nilai-e">{{ krs.nilai.nilai_huruf }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #86868b;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if krs.nilai %}
+                            {{ krs.nilai.get_bobot|default:"-" }}
+                        {% else %}
+                            <span style="color: #86868b;">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="padding: 24px; background: #fbfbfd; border-top: 1px solid #f5f5f7;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+                <div>
+                    <div style="font-size: 13px; color: #6e6e73; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Total Mata Kuliah</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #1d1d1f;">{{ krs_list.count }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; color: #6e6e73; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Total SKS</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #1d1d1f;">
+                        {% widthratio krs_list|length 1 0 %}
+                        {% for krs in krs_list %}{{ krs.kelas.mata_kuliah.sks|add:0 }}{% if not forloop.last %}+{% endif %}{% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; color: #6e6e73; margin-bottom: 8px; font-weight: 600; text-transform: uppercase;">Nilai Tertinggi</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #30d158;">
+                        {% for krs in krs_list %}
+                            {% if krs.nilai and krs.nilai.nilai_huruf %}
+                                {% if forloop.first %}{{ krs.nilai.nilai_huruf }}{% endif %}
+                            {% endif %}
+                        {% empty %}
+                        -
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <p style="font-size: 18px; color: #86868b;">Belum ada nilai yang tersedia.<br>Nilai akan muncul setelah dosen menginput nilai.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,420 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "admin/css/changelists.css" %}">
+<style>
+    /* Modern Change List Styles */
+    #content {
+        padding: 32px !important;
+    }
+    
+    #content-main {
+        position: relative;
+    }
+    
+    /* Page Header */
+    #content h1 {
+        font-size: 32px !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
+        margin-bottom: 8px !important;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    #content h1::before {
+        content: '';
+        width: 6px;
+        height: 36px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+    }
+    
+    /* Object Tools (Add Button) */
+    .object-tools {
+        float: right !important;
+        margin: -48px 0 24px 0 !important;
+    }
+    
+    .object-tools li {
+        list-style: none;
+        display: inline-block;
+        margin-left: 12px;
+    }
+    
+    .object-tools a.addlink {
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        border-radius: 10px !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+        transition: all 0.3s ease !important;
+        font-size: 15px !important;
+    }
+    
+    .object-tools a.addlink:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4) !important;
+    }
+    
+    .object-tools a.addlink::before {
+        content: '+';
+        font-size: 20px;
+        font-weight: 700;
+    }
+    
+    /* Filters Sidebar */
+    #changelist-filter {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        padding: 24px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        position: sticky !important;
+        top: 20px !important;
+    }
+    
+    #changelist-filter h2 {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
+        margin-bottom: 20px !important;
+        padding-bottom: 12px !important;
+        border-bottom: 2px solid #e5e7eb !important;
+    }
+    
+    #changelist-filter h3 {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #6b7280 !important;
+        margin: 20px 0 12px 0 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    #changelist-filter ul {
+        padding: 0 !important;
+        margin: 0 0 16px 0 !important;
+    }
+    
+    #changelist-filter li {
+        list-style: none !important;
+        margin: 0 !important;
+    }
+    
+    #changelist-filter a {
+        display: block !important;
+        padding: 10px 14px !important;
+        color: #374151 !important;
+        text-decoration: none !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        font-size: 14px !important;
+    }
+    
+    #changelist-filter a:hover {
+        background: #f3f4f6 !important;
+        color: #667eea !important;
+        padding-left: 18px !important;
+    }
+    
+    #changelist-filter li.selected a {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)) !important;
+        color: #667eea !important;
+        font-weight: 600 !important;
+        border-left: 3px solid #667eea !important;
+        padding-left: 18px !important;
+    }
+    
+    /* Search Bar */
+    #changelist-search {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        padding: 20px 24px !important;
+        margin-bottom: 24px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    #searchbar {
+        border: 2px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        padding: 12px 16px 12px 44px !important;
+        font-size: 15px !important;
+        width: 100% !important;
+        max-width: 500px !important;
+        transition: all 0.3s ease !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: 14px center !important;
+        background-size: 20px !important;
+    }
+    
+    #searchbar:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
+        outline: none !important;
+    }
+    
+    /* Actions */
+    .actions {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        padding: 16px 24px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+    }
+    
+    .actions label {
+        font-weight: 600 !important;
+        color: #374151 !important;
+        font-size: 14px !important;
+    }
+    
+    .actions select {
+        border: 2px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+        color: #374151 !important;
+        min-width: 200px !important;
+    }
+    
+    .actions select:focus {
+        border-color: #667eea !important;
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+    
+    .actions button[type="submit"] {
+        background: linear-gradient(135deg, #667eea, #764ba2) !important;
+        color: white !important;
+        border: none !important;
+        padding: 10px 24px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .actions button[type="submit"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    /* Main Table Container */
+    #changelist {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    /* Results Table */
+    #result_list {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+    
+    #result_list thead th {
+        background: linear-gradient(to bottom, #f9fafb, #f3f4f6) !important;
+        color: #111827 !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        padding: 16px 20px !important;
+        text-align: left !important;
+        border-bottom: 2px solid #e5e7eb !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+    }
+    
+    #result_list thead th a {
+        color: #111827 !important;
+        text-decoration: none !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    #result_list thead th.sorted {
+        background: linear-gradient(to bottom, #e0e7ff, #ddd6fe) !important;
+    }
+    
+    #result_list thead th.sorted a {
+        color: #667eea !important;
+    }
+    
+    #result_list tbody tr {
+        border-bottom: 1px solid #f3f4f6 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    #result_list tbody tr:hover {
+        background: #f9fafb !important;
+    }
+    
+    #result_list tbody tr:nth-child(even) {
+        background: #fafbfc;
+    }
+    
+    #result_list tbody tr:nth-child(even):hover {
+        background: #f3f4f6 !important;
+    }
+    
+    #result_list tbody td {
+        padding: 16px 20px !important;
+        color: #374151 !important;
+        font-size: 14px !important;
+    }
+    
+    #result_list tbody th {
+        padding: 16px 20px !important;
+        font-weight: 500 !important;
+    }
+    
+    #result_list tbody th a {
+        color: #667eea !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        transition: color 0.2s ease !important;
+    }
+    
+    #result_list tbody th a:hover {
+        color: #5568d3 !important;
+        text-decoration: underline !important;
+    }
+    
+    /* Pagination */
+    .paginator {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        padding: 20px 24px !important;
+        margin-top: 24px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+    }
+    
+    .paginator a,
+    .paginator span {
+        padding: 8px 14px !important;
+        border-radius: 8px !important;
+        text-decoration: none !important;
+        color: #374151 !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        display: inline-block !important;
+    }
+    
+    .paginator a:hover {
+        background: #f3f4f6 !important;
+        color: #667eea !important;
+    }
+    
+    .paginator .this-page {
+        background: linear-gradient(135deg, #667eea, #764ba2) !important;
+        color: white !important;
+        font-weight: 700 !important;
+    }
+    
+    .paginator .end {
+        border: 2px solid #e5e7eb !important;
+    }
+    
+    /* Empty Results */
+    .empty-results {
+        text-align: center !important;
+        padding: 80px 20px !important;
+        color: #9ca3af !important;
+    }
+    
+    .empty-results h2 {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+    &rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+
+{% block main_content %}
+<div id="content-main">
+    {% block object-tools %}
+        {% block object-tools-items %}
+            {% change_list_object_tools %}
+        {% endblock %}
+    {% endblock %}
+    
+    {% if cl.formset and cl.formset.errors %}
+        <p class="errornote">
+        {% blocktrans count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        </p>
+        {{ cl.formset.non_form_errors }}
+    {% endif %}
+    
+    <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+        {% block search %}{% search_form cl %}{% endblock %}
+        {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+
+        <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+            {% if cl.formset %}
+                <div>{{ cl.formset.management_form }}</div>
+            {% endif %}
+
+            {% block result_list %}
+                {% if action_form and actions_on_top and cl.show_admin_actions %}
+                    <div class="actions">
+                        {% admin_actions %}
+                    </div>
+                {% endif %}
+                {% result_list cl %}
+                {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+                    <div class="actions">
+                        {% admin_actions %}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        </form>
+    </div>
+    
+    {% block pagination %}{% pagination cl %}{% endblock %}
+
+    {% block filters %}
+        {% if cl.has_filters %}
+            <div id="changelist-filter">
+                <h2>{% trans 'Filter' %}</h2>
+                {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
+</div>
+{% endblock %}

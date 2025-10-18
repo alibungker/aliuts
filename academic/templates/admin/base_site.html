@@ -1,0 +1,470 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | SIAKAD Admin{% endblock %}
+
+{% block branding %}
+<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 20px;">
+    <h1 id="site-name" style="margin: 0;">
+        <a href="{% url 'admin:index' %}" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+            <div style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2;" viewBox="0 0 24 24">
+                    <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+                </svg>
+            </div>
+            <span style="color: #fff; font-weight: 700; font-size: 20px;">SIAKAD Admin</span>
+        </a>
+    </h1>
+
+    <div class="header-stats">
+        <div class="header-stat-item">
+            <div class="header-stat-icon purple">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div class="header-stat-content">
+                <div class="header-stat-label">Mahasiswa</div>
+                <div class="header-stat-value">{{ total_mahasiswa|default:"0" }}</div>
+            </div>
+        </div>
+
+        <div class="header-stat-item">
+            <div class="header-stat-icon green">
+                <svg viewBox="0 0 24 24">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+            </div>
+            <div class="header-stat-content">
+                <div class="header-stat-label">Dosen</div>
+                <div class="header-stat-value">{{ total_dosen|default:"0" }}</div>
+            </div>
+        </div>
+
+        <div class="header-stat-item">
+            <div class="header-stat-icon orange">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            </div>
+            <div class="header-stat-content">
+                <div class="header-stat-label">Kelas</div>
+                <div class="header-stat-value">{{ total_kelas|default:"0" }}</div>
+            </div>
+        </div>
+
+        <div class="header-stat-item">
+            <div class="header-stat-icon blue">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+            </div>
+            <div class="header-stat-content">
+                <div class="header-stat-label">Mata Kuliah</div>
+                <div class="header-stat-value">{{ total_matakuliah|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom-admin.css' %}">
+<style>
+    /* Header Statistics */
+    .header-stats {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .header-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .header-stat-item:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .header-stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .header-stat-icon.purple { background: rgba(102, 126, 234, 0.9); }
+    .header-stat-icon.green { background: rgba(16, 185, 129, 0.9); }
+    .header-stat-icon.orange { background: rgba(245, 158, 11, 0.9); }
+    .header-stat-icon.blue { background: rgba(59, 130, 246, 0.9); }
+
+    .header-stat-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2.5;
+    }
+
+    .header-stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .header-stat-label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .header-stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: white;
+        line-height: 1;
+    }
+
+    /* Responsive Header */
+    @media (max-width: 1280px) {
+        .header-stats {
+            gap: 16px;
+        }
+
+        .header-stat-item {
+            padding: 8px 12px;
+        }
+
+        .header-stat-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .header-stat-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .header-stat-value {
+            font-size: 18px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .header-stats {
+            display: none;
+        }
+    }
+
+    /* Admin Page Layout with Sidebar */
+    .admin-page-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 24px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    
+    .admin-main-content {
+        min-width: 0;
+    }
+    
+    .admin-sidebar {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 16px;
+    }
+    
+    .sidebar-section h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .sidebar-section h3::before {
+        content: '';
+        width: 4px;
+        height: 18px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+    
+    .sidebar-links {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #374151;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    
+    .sidebar-link:hover {
+        background: #f9fafb;
+        color: #667eea;
+        padding-left: 16px;
+    }
+    
+    .sidebar-link.active {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        color: #667eea;
+        font-weight: 600;
+        border-left: 3px solid #667eea;
+    }
+    
+    .sidebar-link-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+    }
+    
+    .sidebar-link-icon.purple { background: rgba(102, 126, 234, 0.1); }
+    .sidebar-link-icon.green { background: rgba(16, 185, 129, 0.1); }
+    .sidebar-link-icon.orange { background: rgba(245, 158, 11, 0.1); }
+    .sidebar-link-icon.blue { background: rgba(59, 130, 246, 0.1); }
+    .sidebar-link-icon.red { background: rgba(239, 68, 68, 0.1); }
+    
+    .sidebar-link-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2;
+        fill: none;
+    }
+    
+    .sidebar-link-icon.purple svg { stroke: #667eea; }
+    .sidebar-link-icon.green svg { stroke: #10b981; }
+    .sidebar-link-icon.orange svg { stroke: #f59e0b; }
+    .sidebar-link-icon.blue svg { stroke: #3b82f6; }
+    .sidebar-link-icon.red svg { stroke: #ef4444; }
+    
+    .sidebar-link:hover .sidebar-link-icon {
+        transform: scale(1.05);
+    }
+    
+    /* Stat Mini Cards in Sidebar */
+    .sidebar-stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .sidebar-stat {
+        padding: 12px;
+        background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+        border-radius: 8px;
+        border-left: 3px solid var(--stat-color);
+    }
+    
+    .sidebar-stat.purple { --stat-color: #667eea; }
+    .sidebar-stat.green { --stat-color: #10b981; }
+    .sidebar-stat.orange { --stat-color: #f59e0b; }
+    .sidebar-stat.blue { --stat-color: #3b82f6; }
+    
+    .sidebar-stat-label {
+        font-size: 11px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+    
+    .sidebar-stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .admin-page-wrapper {
+            grid-template-columns: 1fr;
+        }
+        
+        .admin-sidebar {
+            position: static;
+            order: 2;
+        }
+        
+        .admin-main-content {
+            order: 1;
+        }
+    }
+    
+    /* Override content width for pages with sidebar */
+    body.change-list #content,
+    body.change-form #content,
+    body:not(.dashboard) #content {
+        padding: 24px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper">
+    <div class="admin-main-content">
+        {% block main_content %}
+        {# Page specific content goes here #}
+        {% endblock %}
+    </div>
+    
+    <div class="admin-sidebar">
+        <div class="sidebar-section">
+            <h3>⚡ Quick Access</h3>
+            <div class="sidebar-links">
+                <a href="{% url 'admin:academic_mahasiswa_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon purple">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <span>Mahasiswa</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_dosen_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon green">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <span>Dosen</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_kelas_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon orange">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <span>Kelas</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_matakuliah_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon blue">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
+                    <span>Mata Kuliah</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_krs_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon purple">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <span>KRS</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_nilai_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon green">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <span>Nilai</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_presensi_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon orange">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <span>Presensi</span>
+                </a>
+                
+                <a href="{% url 'admin:academic_notification_changelist' %}" class="sidebar-link">
+                    <div class="sidebar-link-icon red">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </div>
+                    <span>Notifikasi</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>📊 Statistik</h3>
+            <div class="sidebar-stats">
+                <div class="sidebar-stat purple">
+                    <div class="sidebar-stat-label">Mahasiswa</div>
+                    <div class="sidebar-stat-value">{{ total_mahasiswa|default:"0" }}</div>
+                </div>
+                <div class="sidebar-stat green">
+                    <div class="sidebar-stat-label">Dosen</div>
+                    <div class="sidebar-stat-value">{{ total_dosen|default:"0" }}</div>
+                </div>
+                <div class="sidebar-stat orange">
+                    <div class="sidebar-stat-label">Kelas</div>
+                    <div class="sidebar-stat-value">{{ total_kelas|default:"0" }}</div>
+                </div>
+                <div class="sidebar-stat blue">
+                    <div class="sidebar-stat-label">Mata Kuliah</div>
+                    <div class="sidebar-stat-value">{{ total_matakuliah|default:"0" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

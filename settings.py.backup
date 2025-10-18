@@ -1,0 +1,33 @@
+import os  # Tambahkan ini di baris paling atas
+from pathlib import Path
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+load_dotenv()
+# Gemini Configuration
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+genai.configure(api_key=GEMINI_API_KEY)
+
+# settings.py
+#ALLOWED_HOSTS = ['aliuts.bungker.co.id']
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'aliuts',        # Ganti
+        'USER': 'aliuts',        # Ganti
+        'PASSWORD': 'aliuts123',# Ganti
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+#STATIC_URL = 'static/'
+#STATIC_ROOT = BASE_DIR / 'static'  # Untuk mengumpulkan file static
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Installed apps (tambahkan jika belum ada)
+INSTALLED_APPS = [
+    # ... apps default django
+    'academic',
+    'sip_kuliah',
+    # ... apps lainnya
+]

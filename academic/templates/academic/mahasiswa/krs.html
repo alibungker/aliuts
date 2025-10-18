@@ -1,0 +1,204 @@
+{% extends 'academic/base.html' %}
+
+{% block title %}KRS - Kartu Rencana Studi{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { background: linear-gradient(135deg, #0071e3 0%, #0077ed 100%); color: white; padding: 60px 0; margin: -40px 0 40px 0; border-radius: 0 0 40px 40px; box-shadow: 0 10px 40px rgba(0, 113, 227, 0.3); }
+    .page-header h1 { font-size: 42px; font-weight: 600; margin-bottom: 10px; }
+    .page-header p { font-size: 19px; opacity: 0.9; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 16px; margin-bottom: 20px; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 980px; transition: all 0.3s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.3); }
+    .section-card { background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 32px; overflow: hidden; }
+    .section-header { background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); padding: 24px; border-bottom: 1px solid #d2d2d7; }
+    .section-header h2 { font-size: 22px; font-weight: 600; color: #1d1d1f; margin: 0; }
+    .section-header p { font-size: 15px; color: #6e6e73; margin: 8px 0 0 0; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #fbfbfd; }
+    thead th { padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f5f5f7; }
+    tbody tr { transition: background 0.2s ease; border-bottom: 1px solid #f5f5f7; }
+    tbody tr:hover { background: #fbfbfd; }
+    tbody td { padding: 20px 24px; font-size: 15px; color: #1d1d1f; }
+    .kode-mk { font-weight: 600; color: #0071e3; font-family: 'SF Mono', Monaco, monospace; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-success { background: #d1f4e0; color: #30d158; }
+    .badge-warning { background: #fff4e0; color: #ff9500; }
+    .badge-danger { background: #ffe0e0; color: #ff3b30; }
+    .btn-add { background: #30d158; color: white; padding: 10px 20px; border-radius: 980px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; }
+    .btn-add:hover { background: #28c14e; transform: scale(1.05); box-shadow: 0 6px 16px rgba(48, 209, 88, 0.3); }
+    .btn-remove { background: #ff3b30; color: white; padding: 8px 16px; border-radius: 980px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; transition: all 0.3s ease; }
+    .btn-remove:hover { background: #ff453a; transform: scale(1.05); }
+    .btn-disabled { background: #d2d2d7; color: #86868b; padding: 10px 20px; border-radius: 980px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: not-allowed; }
+    .empty-state { text-align: center; padding: 60px 40px; }
+    .empty-icon { width: 100px; height: 100px; background: #f5f5f7; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .empty-icon svg { width: 56px; height: 56px; stroke: #86868b; fill: none; stroke-width: 2; }
+    .summary-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 24px; background: #fbfbfd; }
+    .summary-item { text-align: center; }
+    .summary-label { font-size: 13px; color: #6e6e73; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+    .summary-value { font-size: 32px; font-weight: 700; color: #0071e3; }
+    @media (max-width: 768px) { table { font-size: 14px; } thead th, tbody td { padding: 12px 16px; } }
+</style>
+
+<div class="page-header">
+    <div class="container">
+        <a href="{% url 'mahasiswa_dashboard' %}" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+            </svg>
+            Kembali
+        </a>
+        <h1>Kartu Rencana Studi (KRS)</h1>
+        <p>{{ mahasiswa.nim }} • {{ mahasiswa.program_studi.nama_prodi }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- KRS yang Sudah Diambil -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>KRS Saya</h2>
+            <p>Daftar mata kuliah yang sudah Anda ambil</p>
+        </div>
+
+        {% if krs_diambil %}
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode</th>
+                    <th>Mata Kuliah</th>
+                    <th>SKS</th>
+                    <th>Kelas</th>
+                    <th>Dosen</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for krs in krs_diambil %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="kode-mk">{{ krs.kelas.mata_kuliah.kode_mk }}</td>
+                    <td>{{ krs.kelas.mata_kuliah.nama_mk }}</td>
+                    <td>{{ krs.kelas.mata_kuliah.sks }}</td>
+                    <td>{{ krs.kelas.kode_kelas }}</td>
+                    <td>{{ krs.kelas.dosen.nama }}</td>
+                    <td>
+                        {% if krs.status == 'disetujui' %}
+                        <span class="badge badge-success">Disetujui</span>
+                        {% elif krs.status == 'pending' %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% else %}
+                        <span class="badge badge-danger">{{ krs.status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if krs.status != 'disetujui' %}
+                        <a href="{% url 'hapus_krs' krs.id %}" class="btn-remove" onclick="return confirm('Yakin ingin menghapus mata kuliah ini dari KRS?')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Hapus
+                        </a>
+                        {% else %}
+                        <span style="color: #86868b; font-size: 13px;">Terkunci</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="summary-box">
+            <div class="summary-item">
+                <div class="summary-label">Total Mata Kuliah</div>
+                <div class="summary-value">{{ krs_diambil.count }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Total SKS</div>
+                <div class="summary-value">{{ total_sks }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Status Disetujui</div>
+                <div class="summary-value">{{ total_disetujui }}</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <p style="font-size: 18px; color: #86868b;">Belum ada mata kuliah yang diambil.<br>Silakan tambahkan dari daftar di bawah.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Daftar Kelas Tersedia -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>Daftar Kelas Tersedia</h2>
+            <p>Pilih mata kuliah yang ingin Anda ambil</p>
+        </div>
+
+        {% if kelas_tersedia %}
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode</th>
+                    <th>Mata Kuliah</th>
+                    <th>SKS</th>
+                    <th>Kelas</th>
+                    <th>Dosen</th>
+                    <th>Kuota</th>
+                    <th>Semester</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for kelas in kelas_tersedia %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="kode-mk">{{ kelas.mata_kuliah.kode_mk }}</td>
+                    <td>{{ kelas.mata_kuliah.nama_mk }}</td>
+                    <td>{{ kelas.mata_kuliah.sks }}</td>
+                    <td>{{ kelas.kode_kelas }}</td>
+                    <td>{{ kelas.dosen.nama }}</td>
+                    <td>{{ kelas.kuota }}</td>
+                    <td>{{ kelas.semester }}</td>
+                    <td>
+                        {% if kelas.id in kelas_diambil_ids %}
+                        <span class="btn-disabled">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Sudah Diambil
+                        </span>
+                        {% else %}
+                        <a href="{% url 'tambah_krs' kelas.id %}" class="btn-add">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"></path>
+                            </svg>
+                            Tambah
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <p style="font-size: 18px; color: #86868b;">Tidak ada kelas tersedia untuk program studi Anda.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

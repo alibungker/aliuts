@@ -1,0 +1,352 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Dashboard Container Override */
+    .admin-main-content {
+        max-width: 100% !important;
+    }
+
+    /* Welcome Banner */
+    .dashboard-welcome {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 32px 28px;
+        border-radius: 14px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-welcome::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .dashboard-welcome h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+        position: relative;
+        z-index: 1;
+        line-height: 1.2;
+    }
+
+    .dashboard-welcome p {
+        font-size: 15px;
+        opacity: 0.92;
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 22px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card.purple { --card-color: #667eea; --card-color-light: #764ba2; }
+    .stat-card.green { --card-color: #10b981; --card-color-light: #059669; }
+    .stat-card.orange { --card-color: #f59e0b; --card-color-light: #d97706; }
+    .stat-card.blue { --card-color: #3b82f6; --card-color-light: #2563eb; }
+    
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
+        margin-bottom: 14px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon svg {
+        width: 26px;
+        height: 26px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2.2;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1;
+    }
+
+    /* Modules Compact View */
+    .modules-compact {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .module-compact {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+    .module-compact:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .module-compact-header {
+        background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+        padding: 14px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .module-compact-header::before {
+        content: '';
+        width: 5px;
+        height: 5px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+
+    .module-compact-body {
+        padding: 8px 10px;
+    }
+    
+    .module-compact-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-radius: 7px;
+        transition: all 0.2s ease;
+        margin-bottom: 4px;
+    }
+
+    .module-compact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .module-compact-item:hover {
+        background: #f3f4f6;
+    }
+
+    .module-compact-item a {
+        color: #374151;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13px;
+        flex: 1;
+    }
+
+    .module-compact-item a:hover {
+        color: #667eea;
+    }
+
+    .module-compact-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .module-compact-action {
+        padding: 5px 11px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .action-add {
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+    }
+
+    .action-add:hover {
+        background: rgba(16, 185, 129, 0.22);
+        color: #047857;
+    }
+
+    .action-change {
+        background: rgba(59, 130, 246, 0.12);
+        color: #2563eb;
+    }
+
+    .action-change:hover {
+        background: rgba(59, 130, 246, 0.22);
+        color: #1d4ed8;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-welcome h1 {
+            font-size: 24px;
+        }
+
+        .dashboard-welcome p {
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block main_content %}
+<div class="dashboard-welcome">
+    <h1>👋 Selamat Datang di Admin Portal</h1>
+    <p>Sistem Informasi Akademik - Dashboard Administrasi</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card purple">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <div class="stat-label">Total Mahasiswa</div>
+        <div class="stat-value">{{ total_mahasiswa|default:"0" }}</div>
+    </div>
+
+    <div class="stat-card green">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+        </div>
+        <div class="stat-label">Total Dosen</div>
+        <div class="stat-value">{{ total_dosen|default:"0" }}</div>
+    </div>
+
+    <div class="stat-card orange">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+        </div>
+        <div class="stat-label">Total Kelas</div>
+        <div class="stat-value">{{ total_kelas|default:"0" }}</div>
+    </div>
+
+    <div class="stat-card blue">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        </div>
+        <div class="stat-label">Mata Kuliah</div>
+        <div class="stat-value">{{ total_matakuliah|default:"0" }}</div>
+    </div>
+</div>
+
+{% if app_list %}
+<div class="modules-compact">
+    {% for app in app_list %}
+    <div class="module-compact">
+        <div class="module-compact-header">
+            {{ app.name }}
+        </div>
+        <div class="module-compact-body">
+            {% for model in app.models %}
+            <div class="module-compact-item">
+                {% if model.admin_url %}
+                    <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                {% else %}
+                    <span>{{ model.name }}</span>
+                {% endif %}
+
+                <div class="module-compact-actions">
+                    {% if model.add_url %}
+                        <a href="{{ model.add_url }}" class="module-compact-action action-add">{% trans 'Add' %}</a>
+                    {% endif %}
+                    {% if model.admin_url %}
+                        <a href="{{ model.admin_url }}" class="module-compact-action action-change">{% trans 'View' %}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
