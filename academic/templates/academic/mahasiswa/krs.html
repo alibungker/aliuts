@@ -13,22 +13,31 @@
     .section-header { background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); padding: 24px; border-bottom: 1px solid #d2d2d7; }
     .section-header h2 { font-size: 22px; font-weight: 600; color: #1d1d1f; margin: 0; }
     .section-header p { font-size: 15px; color: #6e6e73; margin: 8px 0 0 0; }
-    table { width: 100%; border-collapse: collapse; }
+
+    /* Table Wrapper for Responsive */
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
     thead { background: #fbfbfd; }
-    thead th { padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f5f5f7; }
+    thead th { padding: 14px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f5f5f7; white-space: nowrap; }
     tbody tr { transition: background 0.2s ease; border-bottom: 1px solid #f5f5f7; }
     tbody tr:hover { background: #fbfbfd; }
-    tbody td { padding: 20px 24px; font-size: 15px; color: #1d1d1f; }
-    .kode-mk { font-weight: 600; color: #0071e3; font-family: 'SF Mono', Monaco, monospace; }
-    .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    tbody td { padding: 16px 12px; font-size: 14px; color: #1d1d1f; vertical-align: middle; }
+    tbody td:first-child { width: 40px; text-align: center; }
+    tbody td:last-child { width: 130px; white-space: nowrap; }
+
+    .kode-mk { font-weight: 600; color: #0071e3; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
     .badge-success { background: #d1f4e0; color: #30d158; }
     .badge-warning { background: #fff4e0; color: #ff9500; }
     .badge-danger { background: #ffe0e0; color: #ff3b30; }
-    .btn-add { background: #30d158; color: white; padding: 10px 20px; border-radius: 980px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; }
-    .btn-add:hover { background: #28c14e; transform: scale(1.05); box-shadow: 0 6px 16px rgba(48, 209, 88, 0.3); }
-    .btn-remove { background: #ff3b30; color: white; padding: 8px 16px; border-radius: 980px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; transition: all 0.3s ease; }
-    .btn-remove:hover { background: #ff453a; transform: scale(1.05); }
-    .btn-disabled { background: #d2d2d7; color: #86868b; padding: 10px 20px; border-radius: 980px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: not-allowed; }
+
+    /* Tombol Aksi - Lebih Kecil dan Compact */
+    .btn-add { background: #30d158; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.3s ease; white-space: nowrap; }
+    .btn-add:hover { background: #28c14e; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3); }
+    .btn-remove { background: #ff3b30; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.3s ease; white-space: nowrap; }
+    .btn-remove:hover { background: #ff453a; transform: translateY(-1px); }
+    .btn-disabled { background: #e5e5ea; color: #8e8e93; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; cursor: not-allowed; white-space: nowrap; }
     .empty-state { text-align: center; padding: 60px 40px; }
     .empty-icon { width: 100px; height: 100px; background: #f5f5f7; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
     .empty-icon svg { width: 56px; height: 56px; stroke: #86868b; fill: none; stroke-width: 2; }
@@ -36,7 +45,35 @@
     .summary-item { text-align: center; }
     .summary-label { font-size: 13px; color: #6e6e73; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
     .summary-value { font-size: 32px; font-weight: 700; color: #0071e3; }
-    @media (max-width: 768px) { table { font-size: 14px; } thead th, tbody td { padding: 12px 16px; } }
+
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+        table { min-width: 900px; }
+        thead th { padding: 12px 10px; font-size: 11px; }
+        tbody td { padding: 14px 10px; font-size: 13px; }
+        .btn-add, .btn-remove { padding: 5px 10px; font-size: 11px; }
+        .btn-disabled { padding: 5px 10px; font-size: 10px; }
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 { font-size: 32px; }
+        .page-header p { font-size: 16px; }
+        table { min-width: 750px; font-size: 13px; }
+        thead th { padding: 10px 8px; font-size: 10px; }
+        tbody td { padding: 12px 8px; font-size: 12px; }
+        .btn-add, .btn-remove { padding: 4px 8px; font-size: 10px; gap: 2px; }
+        .btn-add svg, .btn-remove svg, .btn-disabled svg { width: 12px; height: 12px; }
+        .btn-disabled { padding: 4px 8px; font-size: 10px; }
+        .badge { padding: 3px 8px; font-size: 10px; }
+        .summary-box { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .summary-value { font-size: 24px; }
+    }
+
+    /* Scroll indicator */
+    .table-wrapper::-webkit-scrollbar { height: 8px; }
+    .table-wrapper::-webkit-scrollbar-track { background: #f5f5f7; border-radius: 10px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #d2d2d7; border-radius: 10px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: #b8b8bc; }
 </style>
 
 <div class="page-header">
@@ -61,19 +98,20 @@
         </div>
 
         {% if krs_diambil %}
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Kode</th>
-                    <th>Mata Kuliah</th>
-                    <th>SKS</th>
-                    <th>Kelas</th>
-                    <th>Dosen</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Mata Kuliah</th>
+                        <th>SKS</th>
+                        <th>Kelas</th>
+                        <th>Dosen</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
             <tbody>
                 {% for krs in krs_diambil %}
                 <tr>
@@ -95,19 +133,20 @@
                     <td>
                         {% if krs.status != 'disetujui' %}
                         <a href="{% url 'hapus_krs' krs.id %}" class="btn-remove" onclick="return confirm('Yakin ingin menghapus mata kuliah ini dari KRS?')">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                             Hapus
                         </a>
                         {% else %}
-                        <span style="color: #86868b; font-size: 13px;">Terkunci</span>
+                        <span style="color: #8e8e93; font-size: 11px; font-weight: 500;">Terkunci</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-        </table>
+            </table>
+        </div>
 
         <div class="summary-box">
             <div class="summary-item">
@@ -143,20 +182,21 @@
         </div>
 
         {% if kelas_tersedia %}
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Kode</th>
-                    <th>Mata Kuliah</th>
-                    <th>SKS</th>
-                    <th>Kelas</th>
-                    <th>Dosen</th>
-                    <th>Kuota</th>
-                    <th>Semester</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Mata Kuliah</th>
+                        <th>SKS</th>
+                        <th>Kelas</th>
+                        <th>Dosen</th>
+                        <th>Kuota</th>
+                        <th>Semester</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
             <tbody>
                 {% for kelas in kelas_tersedia %}
                 <tr>
@@ -171,14 +211,14 @@
                     <td>
                         {% if kelas.id in kelas_diambil_ids %}
                         <span class="btn-disabled">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Sudah Diambil
+                            Diambil
                         </span>
                         {% else %}
                         <a href="{% url 'tambah_krs' kelas.id %}" class="btn-add">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M12 5v14M5 12h14"></path>
                             </svg>
                             Tambah
@@ -188,7 +228,8 @@
                 </tr>
                 {% endfor %}
             </tbody>
-        </table>
+            </table>
+        </div>
         {% else %}
         <div class="empty-state">
             <div class="empty-icon">

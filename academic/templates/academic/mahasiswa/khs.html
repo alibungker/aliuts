@@ -54,6 +54,32 @@
 </div>
 
 <div class="container">
+    <!-- Filter Section -->
+    <div class="section-card" style="padding: 24px; margin-bottom: 24px;">
+        <form action="{% url 'mahasiswa_khs' %}" method="GET" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="tahun_ajaran" class="col-form-label">Tahun Ajaran:</label>
+            </div>
+            <div class="col-auto">
+                <select name="tahun_ajaran" id="tahun_ajaran" class="form-select" onchange="this.form.submit()">
+                    {% for ta in available_tahun_ajaran %}
+                        <option value="{{ ta }}" {% if ta == tahun_ajaran_terpilih %}selected{% endif %}>{{ ta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="semester" class="col-form-label">Semester:</label>
+            </div>
+            <div class="col-auto">
+                <select name="semester" id="semester" class="form-select" onchange="this.form.submit()">
+                    {% for s in available_semesters %}
+                        <option value="{{ s }}" {% if s == semester_terpilih %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
     <!-- IPK Section -->
     <div class="ipk-section">
         <div class="ipk-card">

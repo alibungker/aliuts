@@ -43,7 +43,7 @@
 </div>
 
 <div class="container">
-    <form method="POST" action="{% url 'mahasiswa_edit_biodata' %}">
+    <form method="POST" action="{% url 'mahasiswa_edit_biodata' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Data Pribadi -->
@@ -53,6 +53,16 @@
             </div>
             <div class="form-body">
                 <div class="form-grid">
+                    <div class="form-group form-full">
+                        <label class="form-label">Foto Mahasiswa</label>
+                        {% if mahasiswa.foto %}
+                        <div style="margin-bottom: 12px;">
+                            <img src="{{ mahasiswa.foto.url }}" alt="Foto Mahasiswa" style="max-width: 150px; border-radius: 12px; border: 3px solid #e8e8ed;">
+                        </div>
+                        {% endif %}
+                        <input type="file" name="foto" class="form-input" accept="image/*">
+                        <small style="color: #6b7280; font-size: 13px; margin-top: 6px; display: block;">Format: JPG, PNG, max 2MB</small>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Tempat Lahir</label>
                         <input type="text" name="tempat_lahir" class="form-input" value="{{ mahasiswa.tempat_lahir }}" placeholder="Masukkan tempat lahir">

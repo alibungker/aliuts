@@ -1,0 +1,196 @@
+{% extends "admin/base_site_modern.html" %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="welcome-banner">
+        <h1 class="welcome-title">Selamat Datang, {{ user.get_full_name|default:user.username }}!</h1>
+        <p class="welcome-subtitle">Sistem Informasi Akademik - Dashboard Administrasi</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card purple">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-label">Total Mahasiswa</div>
+            <div class="stat-value">{{ total_mahasiswa|default:"0" }}</div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-label">Total Dosen</div>
+            <div class="stat-value">{{ total_dosen|default:"0" }}</div>
+        </div>
+
+        <div class="stat-card orange">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-label">Total Kelas</div>
+            <div class="stat-value">{{ total_kelas|default:"0" }}</div>
+        </div>
+
+        <div class="stat-card blue">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-label">Mata Kuliah</div>
+            <div class="stat-value">{{ total_matakuliah|default:"0" }}</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="modern-table-container">
+        <div class="table-header">
+            <h2 class="table-title">Quick Actions</h2>
+        </div>
+
+        <div class="quick-actions-grid">
+            {% if app_list %}
+                {% for app in app_list %}
+                    {% for model in app.models %}
+                        <a href="{% if model.admin_url %}{{ model.admin_url }}{% else %}#{% endif %}" class="quick-action-card">
+                            <div class="quick-action-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                            </div>
+                            <div class="quick-action-content">
+                                <h3>{{ model.name }}</h3>
+                                <p>{{ app.name }}</p>
+                            </div>
+                            <div class="quick-action-arrow">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-banner {
+    margin-bottom: 32px;
+}
+
+.welcome-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.welcome-subtitle {
+    font-size: 16px;
+    color: var(--gray-500);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.quick-action-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--gray-200);
+}
+
+.quick-action-card:hover {
+    background: white;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.quick-action-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2;
+}
+
+.quick-action-content {
+    flex: 1;
+}
+
+.quick-action-content h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.quick-action-content p {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.quick-action-arrow {
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quick-action-arrow svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary);
+    fill: none;
+    stroke-width: 2;
+}
+
+.quick-action-card:hover .quick-action-arrow {
+    opacity: 1;
+}
+</style>
+{% endblock %}

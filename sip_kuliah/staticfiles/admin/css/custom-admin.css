@@ -82,31 +82,9 @@ body {
     background: rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Theme Toggle Button */
+/* Theme Toggle Button - HIDDEN */
 .theme-toggle {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 40px !important;
-    height: 40px !important;
-}
-
-.theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-    transform: scale(1.05) !important;
-}
-
-.theme-toggle svg {
-    width: 20px !important;
-    height: 20px !important;
-    fill: white !important;
-    stroke: white !important;
+    display: none !important;
 }
 
 .visually-hidden {
@@ -725,4 +703,171 @@ input[type="checkbox"]:checked {
 .xfull a.active {
     background: linear-gradient(135deg, #667eea, #764ba2) !important;
     color: white !important;
+}
+
+/* Override content width for pages with sidebar */
+body.change-list #content,
+body:not(.dashboard) #content {
+    padding: 24px !important;
+}
+
+/* Special styling for change form to maximize form space */
+body.change-form #content {
+    padding: 24px !important;
+}
+
+/* Change form specific styles */
+form .module,
+.form-row {
+    margin-bottom: 0 !important;
+}
+
+.change-form-container {
+    background: var(--bg-primary) !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    box-shadow: var(--shadow) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.change-form-container .form-container {
+    margin-bottom: 20px !important;
+}
+
+.change-form-container .module {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.change-form-container .module h2,
+.change-form-container .module caption {
+    background: var(--bg-tertiary) !important;
+    margin-top: 0 !important;
+}
+
+/* Specific styling for form rows */
+.form-row {
+    padding: 16px 20px !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.form-row:last-child {
+    border-bottom: none !important;
+}
+
+/* Improve form readability */
+.change-form-container label {
+    display: block !important;
+    margin-bottom: 4px !important;
+}
+
+.change-form-container input,
+.change-form-container select,
+.change-form-container textarea {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Responsive adjustments for form */
+@media (max-width: 768px) {
+    .change-form-container {
+        padding: 16px !important;
+    }
+    
+    .form-row {
+        padding: 12px 16px !important;
+    }
+}
+
+/* Layout for pages without sidebar */
+.admin-main-content-full {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 24px !important;
+}
+
+/* Adjustments for change form specifically */
+body.change-form #content {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Change list container styling */
+.change-list-container {
+    background: var(--bg-primary) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: var(--shadow) !important;
+    border: 1px solid var(--border) !important;
+}
+
+#changelist {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 8px !important;
+}
+
+.changelist-form-container {
+    margin-bottom: 20px !important;
+}
+
+/* Filter styling */
+#changelist-filter {
+    background: var(--bg-tertiary) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+#changelist-filter h2 {
+    margin-top: 0 !important;
+    color: var(--text-primary) !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+/* ===== HIDE UNWANTED ELEMENTS ===== */
+
+/* Hide left sidebar navigation completely */
+#nav-sidebar {
+    display: none !important;
+}
+
+/* Hide skip to content link */
+.skip-to-content,
+a[href="#content-start"] {
+    display: none !important;
+}
+
+/* Hide navigation filter/search in sidebar */
+#nav-filter {
+    display: none !important;
+}
+
+/* Adjust main content to use full width when sidebar is hidden */
+#content {
+    margin-left: 0 !important;
+}
+
+.main {
+    margin-left: 0 !important;
+}
+
+/* Make content area full width */
+#container {
+    display: block !important;
+}
+
+/* Ensure theme toggle is completely hidden */
+.theme-toggle,
+button.theme-toggle,
+.theme-icon-when-auto,
+.theme-icon-when-light,
+.theme-icon-when-dark {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }

@@ -15,6 +15,7 @@ urlpatterns = [
     path('mahasiswa/presensi/', views.mahasiswa_presensi, name='mahasiswa_presensi'),
     path('mahasiswa/biodata/', views.mahasiswa_biodata, name='mahasiswa_biodata'),
     path('mahasiswa/biodata/edit/', views.mahasiswa_edit_biodata, name='mahasiswa_edit_biodata'),
+    path('mahasiswa/cetak-kartu/', views.mahasiswa_cetak_kartu, name='mahasiswa_cetak_kartu'),
 
     # Dosen URLs
     path('dosen/', views.dosen_dashboard, name='dosen_dashboard'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('dosen/kelas/<int:kelas_id>/presensi/', views.dosen_input_presensi, name='dosen_input_presensi'),
     path('dosen/biodata/', views.dosen_biodata, name='dosen_biodata'),
     path('dosen/biodata/edit/', views.dosen_edit_biodata, name='dosen_edit_biodata'),
+    path('dosen/cetak-kartu/', views.dosen_cetak_kartu, name='dosen_cetak_kartu'),
     path('dosen/notifications/', views.dosen_notifications, name='dosen_notifications'),
     path('dosen/krs/<int:krs_id>/approve/', views.dosen_approve_krs, name='dosen_approve_krs'),
     path('dosen/krs/<int:krs_id>/reject/', views.dosen_reject_krs, name='dosen_reject_krs'),

@@ -144,21 +144,69 @@ def mahasiswa_khs(request):
         messages.error(request, 'Anda belum terdaftar sebagai mahasiswa.')
         return redirect('home')
 
-    # Ambil semua KRS yang sudah ada nilainya
+    # Dapatkan daftar tahun ajaran dan semester yang tersedia
+    available_tahun_ajaran = Kelas.objects.values_list('tahun_ajaran', flat=True).distinct().order_by('-tahun_ajaran')
+    available_semesters = ['Ganjil', 'Genap']
+
+    # Ambil tahun ajaran dan semester dari GET parameter atau gunakan yang terbaru
+    tahun_ajaran = request.GET.get('tahun_ajaran')
+    if not tahun_ajaran and available_tahun_ajaran.exists():
+        tahun_ajaran = available_tahun_ajaran.first()
+
+    semester = request.GET.get('semester', 'Ganjil')
+
+    # Ambil semua KRS yang sudah ada nilainya untuk semester yang dipilih
     krs_list = KRS.objects.filter(
         mahasiswa=mahasiswa,
-        status='disetujui'
-    ).select_related('kelas__mata_kuliah', 'kelas__dosen')
+        status='disetujui',
+        kelas__tahun_ajaran=tahun_ajaran,
+        kelas__semester=semester,
+    ).select_related('kelas__mata_kuliah', 'kelas__dosen', 'nilai')
 
-    # Hitung IPS dan IPK
-    ips = hitung_ips(mahasiswa, '2024/2025', 'Ganjil')
-    ipk = hitung_ipk(mahasiswa)
+    # Hitung IPS (Indeks Prestasi Semester)
+    total_sks_semester = 0
+    total_nilai_x_sks_semester = 0
+    for krs in krs_list:
+        try:
+            nilai = krs.nilai
+            sks = krs.kelas.mata_kuliah.sks
+            bobot = nilai.get_bobot()
+            total_sks_semester += sks
+            total_nilai_x_sks_semester += (bobot * sks)
+        except Nilai.DoesNotExist:
+            pass
+
+    ips = round(total_nilai_x_sks_semester / total_sks_semester, 2) if total_sks_semester > 0 else 0.00
+
+    # Hitung IPK (Indeks Prestasi Kumulatif) - semua semester
+    all_krs = KRS.objects.filter(
+        mahasiswa=mahasiswa,
+        status='disetujui'
+    ).select_related('kelas__mata_kuliah', 'nilai')
+
+    total_sks_kumulatif = 0
+    total_nilai_x_sks_kumulatif = 0
+    for krs in all_krs:
+        try:
+            nilai = krs.nilai
+            sks = krs.kelas.mata_kuliah.sks
+            bobot = nilai.get_bobot()
+            total_sks_kumulatif += sks
+            total_nilai_x_sks_kumulatif += (bobot * sks)
+        except Nilai.DoesNotExist:
+            pass
+
+    ipk = round(total_nilai_x_sks_kumulatif / total_sks_kumulatif, 2) if total_sks_kumulatif > 0 else 0.00
 
     context = {
         'mahasiswa': mahasiswa,
         'krs_list': krs_list,
         'ips': ips,
         'ipk': ipk,
+        'tahun_ajaran_terpilih': tahun_ajaran,
+        'semester_terpilih': semester,
+        'available_tahun_ajaran': available_tahun_ajaran,
+        'available_semesters': available_semesters,
     }
     return render(request, 'academic/mahasiswa/khs.html', context)
 
@@ -312,17 +360,16 @@ def dosen_input_nilai(request, kelas_id):
 
                 # Konversi nilai angka ke huruf
                 nilai_angka = float(value) if value else None
-                nilai_huruf = konversi_nilai_ke_huruf(nilai_angka) if nilai_angka else None
+                nilai_huruf = konversi_nilai_ke_huruf(nilai_angka) if nilai_angka is not None else None
 
                 # Update atau create nilai
-                if nilai_huruf:
-                    Nilai.objects.update_or_create(
-                        krs=krs,
-                        defaults={
-                            'nilai_angka': nilai_angka,
-                            'nilai_huruf': nilai_huruf
-                        }
-                    )
+                Nilai.objects.update_or_create(
+                    krs=krs,
+                    defaults={
+                        'nilai_angka': nilai_angka,
+                        'nilai_huruf': nilai_huruf
+                    }
+                )
 
         messages.success(request, 'Nilai berhasil disimpan.')
         return redirect('dosen_kelas_detail', kelas_id=kelas_id)
@@ -506,6 +553,10 @@ def mahasiswa_edit_biodata(request):
         mahasiswa.no_telp_ortu = request.POST.get('no_telp_ortu', '')
         mahasiswa.alamat_ortu = request.POST.get('alamat_ortu', '')
 
+        # Handle foto upload
+        if request.FILES.get('foto'):
+            mahasiswa.foto = request.FILES['foto']
+
         mahasiswa.save()
         messages.success(request, 'Biodata berhasil diupdate!')
         return redirect('mahasiswa_biodata')
@@ -537,6 +588,10 @@ def dosen_edit_biodata(request):
         dosen.pendidikan_terakhir = request.POST.get('pendidikan_terakhir', '')
         dosen.nip = request.POST.get('nip', '')
 
+        # Handle foto upload
+        if request.FILES.get('foto'):
+            dosen.foto = request.FILES['foto']
+
         dosen.save()
         messages.success(request, 'Biodata berhasil diupdate!')
         return redirect('dosen_biodata')
@@ -545,6 +600,36 @@ def dosen_edit_biodata(request):
         'dosen': dosen,
     }
     return render(request, 'academic/dosen/edit_biodata.html', context)
+
+# ===== VIEWS UNTUK CETAK KARTU =====
+
+@login_required
+def mahasiswa_cetak_kartu(request):
+    """Cetak kartu mahasiswa"""
+    try:
+        mahasiswa = Mahasiswa.objects.get(user=request.user)
+    except Mahasiswa.DoesNotExist:
+        messages.error(request, 'Anda belum terdaftar sebagai mahasiswa.')
+        return redirect('home')
+
+    context = {
+        'mahasiswa': mahasiswa,
+    }
+    return render(request, 'academic/mahasiswa/cetak_kartu.html', context)
+
+@login_required
+def dosen_cetak_kartu(request):
+    """Cetak kartu dosen"""
+    try:
+        dosen = Dosen.objects.get(user=request.user)
+    except Dosen.DoesNotExist:
+        messages.error(request, 'Anda belum terdaftar sebagai dosen.')
+        return redirect('home')
+
+    context = {
+        'dosen': dosen,
+    }
+    return render(request, 'academic/dosen/cetak_kartu.html', context)
 
 # ===== HELPER FUNCTIONS =====
 
@@ -659,6 +744,7 @@ def custom_login(request):
                 dosen = Dosen.objects.get(user=user)
                 return redirect('dosen_dashboard')
             except Dosen.DoesNotExist:
+                messages.info(request, 'Profil Anda belum lengkap. Silakan hubungi administrator.')
                 pass
             return redirect('home')
         else:
@@ -701,6 +787,7 @@ def home(request):
             dosen = Dosen.objects.get(user=request.user)
             return redirect('dosen_dashboard')
         except Dosen.DoesNotExist:
+            messages.info(request, 'Profil Anda belum lengkap. Silakan hubungi administrator.')
             pass
 
     return render(request, 'academic/home.html')

@@ -39,7 +39,7 @@ class Dosen(models.Model):
         ('Honorer', 'Dosen Honorer')
     ], blank=True)
     nip = models.CharField(max_length=30, blank=True, verbose_name='NIP')
-    foto = models.CharField(max_length=255, blank=True)
+    foto = models.ImageField(upload_to='dosen/', blank=True, null=True)
 
     def __str__(self):
         return self.nama
@@ -81,7 +81,7 @@ class Mahasiswa(models.Model):
     pekerjaan_ibu = models.CharField(max_length=100, blank=True)
     no_telp_ortu = models.CharField(max_length=15, blank=True)
     alamat_ortu = models.TextField(blank=True)
-    foto = models.CharField(max_length=255, blank=True)
+    foto = models.ImageField(upload_to='mahasiswa/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.nim} - {self.nama}"
