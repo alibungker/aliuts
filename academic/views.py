@@ -771,6 +771,118 @@ def custom_logout(request):
     messages.success(request, 'Anda telah berhasil logout.')
     return redirect('home')
 
+# ===== AKADEMIK VIEWS =====
+
+@login_required
+def semester_list(request):
+    """Daftar semua semester"""
+    semesters = Semester.objects.all()
+    context = {
+        'semesters': semesters,
+        'title': 'Daftar Semester'
+    }
+    return render(request, 'academic/admin/semester_list.html', context)
+
+@login_required
+def semester_create(request):
+    """Tambah semester baru"""
+    if request.method == 'POST':
+        nama_semester = request.POST.get('nama_semester')
+        kode_semester = request.POST.get('kode_semester')
+        tahun_ajaran = request.POST.get('tahun_ajaran')
+        jenis_semester = request.POST.get('jenis_semester')
+        tanggal_mulai = request.POST.get('tanggal_mulai')
+        tanggal_selesai = request.POST.get('tanggal_selesai')
+
+        # Nonaktifkan semua semester yang lain
+        Semester.objects.all().update(aktif=False)
+
+        # Buat semester baru
+        semester = Semester.objects.create(
+            nama_semester=nama_semester,
+            kode_semester=kode_semester,
+            tahun_ajaran=tahun_ajaran,
+            jenis_semester=jenis_semester,
+            tanggal_mulai=tanggal_mulai,
+            tanggal_selesai=tanggal_selesai,
+            aktif=True
+        )
+
+        messages.success(request, f'Semester {semester.nama_semester} berhasil ditambahkan.')
+        return redirect('semester_list')
+
+    return render(request, 'academic/admin/semester_form.html', {'title': 'Tambah Semester'})
+
+@login_required
+def penawaran_kelas_list(request):
+    """Daftar penawaran kelas"""
+    kelas_list = Kelas.objects.all().select_related('mata_kuliah', 'dosen', 'mata_kuliah__program_studi')
+    context = {
+        'kelas_list': kelas_list,
+        'title': 'Penawaran Kelas'
+    }
+    return render(request, 'academic/admin/penawaran_kelas_list.html', context)
+
+@login_required
+def jadwal_list(request):
+    """Daftar jadwal kuliah"""
+    jadwal_list = Jadwal.objects.all().select_related('kelas', 'kelas__mata_kuliah', 'kelas__dosen')
+
+    # Filter berdasarkan semester aktif jika ada
+    try:
+        semester_aktif = Semester.objects.get(aktif=True)
+        # Filter kelas yang ditawarkan pada semester ini
+        jadwal_list = jadwal_list.filter(
+            kelas__tahun_ajaran=semester_aktif.tahun_ajaran,
+            kelas__semester=semester_aktif.jenis_semester
+        )
+    except Semester.DoesNotExist:
+        pass
+
+    # Group by hari untuk tampilan yang lebih baik
+    jadwal_by_hari = {}
+    for jadwal in jadwal_list:
+        if jadwal.hari not in jadwal_by_hari:
+            jadwal_by_hari[jadwal.hari] = []
+        jadwal_by_hari[jadwal.hari].append(jadwal)
+
+    context = {
+        'jadwal_by_hari': jadwal_by_hari,
+        'title': 'Jadwal Kuliah'
+    }
+    return render(request, 'academic/admin/jadwal_list.html', context)
+
+@login_required
+def jadwal_create(request):
+    """Tambah jadwal baru"""
+    if request.method == 'POST':
+        kelas_id = request.POST.get('kelas')
+        hari = request.POST.get('hari')
+        jam_mulai = request.POST.get('jam_mulai')
+        jam_selesai = request.POST.get('jam_selesai')
+        ruangan = request.POST.get('ruangan')
+
+        kelas = get_object_or_404(Kelas, id=kelas_id)
+
+        jadwal = Jadwal.objects.create(
+            kelas=kelas,
+            hari=hari,
+            jam_mulai=jam_mulai,
+            jam_selesai=jam_selesai,
+            ruangan=ruangan
+        )
+
+        messages.success(request, f'Jadwal untuk {kelas.mata_kuliah.nama_mk} berhasil ditambahkan.')
+        return redirect('jadwal_list')
+
+    kelas_list = Kelas.objects.all().select_related('mata_kuliah', 'dosen')
+    context = {
+        'kelas_list': kelas_list,
+        'title': 'Tambah Jadwal',
+        'hari_choices': Jadwal._meta.get_field('hari').choices
+    }
+    return render(request, 'academic/admin/jadwal_form.html', context)
+
 # ===== HOME PAGE =====
 
 def home(request):

@@ -1,0 +1,117 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="wow-content-body">
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'jadwal_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Jadwal
+        </a>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+            {{ message|capfirst }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if jadwal_by_hari %}
+    {% for hari, jadwal_harian in jadwal_by_hari.items %}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-calendar-week"></i> {{ hari }}
+                <span class="badge bg-light text-dark float-end">{{ jadwal_harian|length }} jadwal</span>
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="15%">Waktu</th>
+                            <th width="20%">Kelas</th>
+                            <th width="25%">Mata Kuliah</th>
+                            <th width="20%">Dosen</th>
+                            <th width="15%">Ruangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for jadwal in jadwal_harian %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ jadwal.jam_mulai }}</span>
+                                <span class="mx-1">-</span>
+                                <span class="badge bg-info">{{ jadwal.jam_selesai }}</span>
+                            </td>
+                            <td><strong>{{ jadwal.kelas.kode_kelas }}</strong></td>
+                            <td>
+                                <div>
+                                    <strong>{{ jadwal.kelas.mata_kuliah.nama_mk }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ jadwal.kelas.mata_kuliah.sks }} SKS</small>
+                                </div>
+                            </td>
+                            <td>{{ jadwal.kelas.dosen.nama }}</td>
+                            <td>
+                                <span class="badge bg-{% if 'LAB' in jadwal.ruangan %}success{% elif 'AUD' in jadwal.ruangan %}warning{% else %}secondary{% endif %}">
+                                    {{ jadwal.ruangan }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+            <h5 class="text-muted mt-3">Belum Ada Jadwal</h5>
+            <p class="text-muted">Jadwal kuliah untuk semester ini belum tersedia</p>
+            <a href="{% url 'jadwal_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Tambah Jadwal
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">{{ jadwal_by_hari.keys|length }}</h5>
+                    <p class="card-text">Hari Aktif</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">{{ jadwal_by_hari.values|length }}</h5>
+                    <p class="card-text">Total Jadwal</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">
+                        {{ jadwal_by_hari.values|length }}
+                    </h5>
+                    <p class="card-text">Ruangan Digunakan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

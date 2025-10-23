@@ -1,0 +1,143 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="wow-content-body">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+            {{ message|capfirst }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="kelas" class="form-label">Kelas <span class="text-danger">*</span></label>
+                            <select class="form-select" id="kelas" name="kelas" required>
+                                <option value="">Pilih Kelas</option>
+                                {% for kelas in kelas_list %}
+                                <option value="{{ kelas.id }}">
+                                    {{ kelas.kode_kelas }} - {{ kelas.mata_kuliah.nama_mk }} ({{ kelas.dosen.nama }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="hari" class="form-label">Hari <span class="text-danger">*</span></label>
+                            <select class="form-select" id="hari" name="hari" required>
+                                <option value="">Pilih Hari</option>
+                                {% for value, label in hari_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="jam_mulai" class="form-label">Jam Mulai <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="jam_selesai" class="form-label">Jam Selesai <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="ruangan" class="form-label">Ruangan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ruangan" name="ruangan" required
+                                   placeholder="Contoh: R301, LAB01, AUD01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'jadwal_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Simpan Jadwal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Jadwal Reference -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h6 class="mb-0">Referensi Waktu Kuliah</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary">Senin - Jumat</h6>
+                    <table class="table table-sm">
+                        <tr><td>07:00 - 08:40</td><td>Sesi 1 (2 SKS)</td></tr>
+                        <tr><td>08:50 - 10:30</td><td>Sesi 2 (2 SKS)</td></tr>
+                        <tr><td>10:40 - 12:20</td><td>Sesi 3 (2 SKS)</td></tr>
+                        <tr><td>13:00 - 14:40</td><td>Sesi 4 (2 SKS)</td></tr>
+                        <tr><td>14:50 - 16:30</td><td>Sesi 5 (2 SKS)</td></tr>
+                        <tr><td>16:40 - 18:20</td><td>Sesi 6 (2 SKS)</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-success">Sabtu</h6>
+                    <table class="table table-sm">
+                        <tr><td>07:00 - 09:30</td><td>Sesi 1 (3 SKS)</td></tr>
+                        <tr><td>09:40 - 12:10</td><td>Sesi 2 (3 SKS)</td></tr>
+                        <tr><td>13:00 - 15:30</td><td>Sesi 3 (3 SKS)</td></tr>
+                        <tr><td>15:40 - 18:10</td><td>Sesi 4 (3 SKS)</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jamMulai = document.getElementById('jam_mulai');
+    const jamSelesai = document.getElementById('jam_selesai');
+    const kelasSelect = document.getElementById('kelas');
+
+    // Auto-calculate jam selesai based on SKS
+    function updateJamSelesai() {
+        if (jamMulai.value && kelasSelect.value) {
+            const selectedOption = kelasSelect.options[kelasSelect.selectedIndex];
+            const kelasText = selectedOption.text;
+
+            // Extract SKS from the option text (assuming format contains SKS info)
+            // This is a simplified approach - you might need to adjust based on your data
+            const start = new Date(`2000-01-01T${jamMulai.value}`);
+
+            // Default 2 hours for 2 SKS
+            let duration = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+            start.setTime(start.getTime() + duration);
+
+            const hours = String(start.getHours()).padStart(2, '0');
+            const minutes = String(start.getMinutes()).padStart(2, '0');
+            jamSelesai.value = `${hours}:${minutes}`;
+        }
+    }
+
+    jamMulai.addEventListener('change', updateJamSelesai);
+    kelasSelect.addEventListener('change', updateJamSelesai);
+});
+</script>
+{% endblock %}

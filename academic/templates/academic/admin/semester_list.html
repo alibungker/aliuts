@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="wow-content-body">
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'semester_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Semester
+        </a>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+            {{ message|capfirst }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="15%">Kode Semester</th>
+                            <th width="25%">Nama Semester</th>
+                            <th width="15%">Tahun Ajaran</th>
+                            <th width="10%">Jenis</th>
+                            <th width="20%">Periode</th>
+                            <th width="10%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for semester in semesters %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td><strong>{{ semester.kode_semester }}</strong></td>
+                            <td>{{ semester.nama_semester }}</td>
+                            <td>{{ semester.tahun_ajaran }}</td>
+                            <td>
+                                <span class="badge bg-{% if semester.jenis_semester == 'Ganjil' %}primary{% elif semester.jenis_semester == 'Genap' %}success{% else %}warning{% endif %}">
+                                    {{ semester.jenis_semester }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>
+                                    {{ semester.tanggal_mulai|date:"d M Y" }} - {{ semester.tanggal_selesai|date:"d M Y" }}
+                                </small>
+                            </td>
+                            <td class="text-center">
+                                {% if semester.aktif %}
+                                <span class="badge bg-success">Aktif</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Tidak Aktif</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-calendar-x"></i>
+                                <p class="mb-0">Belum ada data semester</p>
+                                <a href="{% url 'semester_create' %}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Tambah Semester
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

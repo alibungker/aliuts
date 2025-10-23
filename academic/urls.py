@@ -29,4 +29,11 @@ urlpatterns = [
     path('dosen/notifications/', views.dosen_notifications, name='dosen_notifications'),
     path('dosen/krs/<int:krs_id>/approve/', views.dosen_approve_krs, name='dosen_approve_krs'),
     path('dosen/krs/<int:krs_id>/reject/', views.dosen_reject_krs, name='dosen_reject_krs'),
+
+    # Akademik URLs
+    path('admin/semester/', views.semester_list, name='semester_list'),
+    path('admin/semester/tambah/', views.semester_create, name='semester_create'),
+    path('admin/penawaran-kelas/', views.penawaran_kelas_list, name='penawaran_kelas_list'),
+    path('admin/jadwal/', views.jadwal_list, name='jadwal_list'),
+    path('admin/jadwal/tambah/', views.jadwal_create, name='jadwal_create'),
 ]

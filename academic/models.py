@@ -1,18 +1,68 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Fakultas(models.Model):
+    kode_fakultas = models.CharField(max_length=10, unique=True)
+    nama_fakultas = models.CharField(max_length=100)
+    dekan = models.CharField(max_length=100, blank=True)
+    no_telp = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(blank=True)
+    alamat = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Fakultas"
+        verbose_name_plural = "Fakultas"
+
+    def __str__(self):
+        return f"{self.kode_fakultas} - {self.nama_fakultas}"
+
 class ProgramStudi(models.Model):
     kode_prodi = models.CharField(max_length=10, unique=True)
     nama_prodi = models.CharField(max_length=100)
+    fakultas = models.ForeignKey(Fakultas, on_delete=models.CASCADE, null=True, blank=True)
     jenjang = models.CharField(max_length=20, choices=[
         ('D3', 'Diploma 3'),
         ('S1', 'Sarjana'),
         ('S2', 'Magister'),
         ('S3', 'Doktor')
     ])
-    
+    kaprodi = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        verbose_name = "Program Studi"
+        verbose_name_plural = "Program Studi"
+
     def __str__(self):
         return f"{self.kode_prodi} - {self.nama_prodi}"
+
+class Ruang(models.Model):
+    kode_ruang = models.CharField(max_length=10, unique=True)
+    nama_ruang = models.CharField(max_length=50)
+    gedung = models.CharField(max_length=20, blank=True)
+    lantai = models.CharField(max_length=10, blank=True)
+    kapasitas = models.IntegerField(default=0)
+    jenis_ruang = models.CharField(max_length=20, choices=[
+        ('Kelas', 'Kelas'),
+        ('Lab', 'Laboratorium'),
+        ('Seminar', 'Ruang Seminar'),
+        ('Auditorium', 'Auditorium'),
+        ('Kantor', 'Ruang Kantor'),
+    ], default='Kelas')
+    fasilitas = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=[
+        ('Aktif', 'Aktif'),
+        ('Maintenance', 'Maintenance'),
+        ('Tidak Aktif', 'Tidak Aktif'),
+    ], default='Aktif')
+
+    class Meta:
+        verbose_name = "Ruang"
+        verbose_name_plural = "Ruang"
+
+    def __str__(self):
+        return f"{self.kode_ruang} - {self.nama_ruang}"
 
 class Dosen(models.Model):
     nidn = models.CharField(max_length=20, unique=True)
@@ -40,6 +90,10 @@ class Dosen(models.Model):
     ], blank=True)
     nip = models.CharField(max_length=30, blank=True, verbose_name='NIP')
     foto = models.ImageField(upload_to='dosen/', blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Dosen"
+        verbose_name_plural = "Dosen"
 
     def __str__(self):
         return self.nama
@@ -83,6 +137,10 @@ class Mahasiswa(models.Model):
     alamat_ortu = models.TextField(blank=True)
     foto = models.ImageField(upload_to='mahasiswa/', blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Mahasiswa"
+        verbose_name_plural = "Mahasiswa"
+
     def __str__(self):
         return f"{self.nim} - {self.nama}"
 
@@ -93,7 +151,11 @@ class MataKuliah(models.Model):
     program_studi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
     semester = models.IntegerField()
     deskripsi = models.TextField(blank=True)
-    
+
+    class Meta:
+        verbose_name = "Mata Kuliah"
+        verbose_name_plural = "Mata Kuliah"
+
     def __str__(self):
         return f"{self.kode_mk} - {self.nama_mk}"
 
@@ -107,7 +169,11 @@ class Kelas(models.Model):
         ('Genap', 'Genap')
     ])
     kuota = models.IntegerField()
-    
+
+    class Meta:
+        verbose_name = "Kelas"
+        verbose_name_plural = "Kelas"
+
     def __str__(self):
         return f"{self.kode_kelas} - {self.mata_kuliah.nama_mk}"
 
@@ -195,6 +261,25 @@ class Nilai(models.Model):
             'D': 1.0, 'E': 0.0
         }
         return bobot_map.get(self.nilai_huruf, 0.0)
+
+class Semester(models.Model):
+    nama_semester = models.CharField(max_length=50)
+    kode_semester = models.CharField(max_length=10, unique=True)
+    tahun_ajaran = models.CharField(max_length=9)  # Format: 2024/2025
+    jenis_semester = models.CharField(max_length=10, choices=[
+        ('Ganjil', 'Ganjil'),
+        ('Genap', 'Genap'),
+        ('Pendek', 'Pendek')
+    ])
+    tanggal_mulai = models.DateField()
+    tanggal_selesai = models.DateField()
+    aktif = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-tahun_ajaran', '-jenis_semester']
+
+    def __str__(self):
+        return f"{self.nama_semester} ({self.tahun_ajaran})"
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

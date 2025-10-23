@@ -1,0 +1,117 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="wow-content-body">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+            {{ message|capfirst }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="nama_semester" class="form-label">Nama Semester <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nama_semester" name="nama_semester" required
+                                   placeholder="Contoh: Semester Ganjil 2025/2026">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="kode_semester" class="form-label">Kode Semester <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="kode_semester" name="kode_semester" required
+                                   placeholder="Contoh: 20251" maxlength="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="tahun_ajaran" class="form-label">Tahun Ajaran <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="tahun_ajaran" name="tahun_ajaran" required
+                                   placeholder="Contoh: 2025/2026" maxlength="9">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="jenis_semester" class="form-label">Jenis Semester <span class="text-danger">*</span></label>
+                            <select class="form-select" id="jenis_semester" name="jenis_semester" required>
+                                <option value="">Pilih Jenis Semester</option>
+                                <option value="Ganjil">Ganjil</option>
+                                <option value="Genap">Genap</option>
+                                <option value="Pendek">Pendek</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="tanggal_mulai" class="form-label">Tanggal Mulai <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="tanggal_selesai" class="form-label">Tanggal Selesai <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="tanggal_selesai" name="tanggal_selesai" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'semester_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Simpan Semester
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-generate kode semester berdasarkan tahun ajaran dan jenis
+    const tahunAjaran = document.getElementById('tahun_ajaran');
+    const jenisSemester = document.getElementById('jenis_semester');
+    const kodeSemester = document.getElementById('kode_semester');
+    const namaSemester = document.getElementById('nama_semester');
+
+    function generateKodeSemester() {
+        if (tahunAjaran.value && jenisSemester.value) {
+            const tahun = tahunAjaran.value.split('/')[0];
+            let kode = tahun;
+
+            if (jenisSemester.value === 'Ganjil') {
+                kode += '1';
+            } else if (jenisSemester.value === 'Genap') {
+                kode += '2';
+            } else if (jenisSemester.value === 'Pendek') {
+                kode += '3';
+            }
+
+            kodeSemester.value = kode;
+
+            // Auto-generate nama semester
+            namaSemester.value = `Semester ${jenisSemester.value} ${tahunAjaran.value}`;
+        }
+    }
+
+    tahunAjaran.addEventListener('change', generateKodeSemester);
+    jenisSemester.addEventListener('change', generateKodeSemester);
+});
+</script>
+{% endblock %}

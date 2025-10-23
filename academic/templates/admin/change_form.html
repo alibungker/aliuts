@@ -1,92 +1,97 @@
-{% extends "admin/base.html" %}
+{% extends "admin/form_bootstrap.html" %}
 {% load i18n admin_urls static admin_modify %}
 
-{% block extrahead %}
-    {{ block.super }}
-    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
-    {{ media }}
-{% endblock %}
+{% block form_content %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% csrf_token %}
 
-{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+    {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
 
-{% block branding %}
-<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 20px;">
-    <h1 id="site-name" style="margin: 0;">
-        <a href="{% url 'admin:index' %}" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-            <div style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                <svg style="width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2;" viewBox="0 0 24 24">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
-                </svg>
-            </div>
-            <span style="color: #fff; font-weight: 700; font-size: 20px;">SIAKAD Admin</span>
-        </a>
-    </h1>
-</div>
-{% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom-admin.css' %}">
-{% endblock %}
-
-{% if not is_popup %}
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-    &rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
-    &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
-</div>
-{% endblock %}
-{% endif %}
-
-{% block content %}
-<div class="change-form-container">
-    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
-        {% csrf_token %}
-        
-        {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
-        
-        {% if errors %}
-            <div class="errornote">
-                <ul>
-                    {% for error in errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        
-        {% if form.non_field_errors %}
-            <div class="errornote">
-                <ul>
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        
-        <div class="form-container">
-            {% block field_sets %}
-                {% for fieldset in adminform %}
-                    {% include "admin/includes/fieldset.html" %}
-                {% endfor %}
-            {% endblock %}
-            
-            {% block after_field_sets %}{% endblock %}
-        </div>
-        
-        {% block inline_field_sets %}
-            {% for inline_admin_formset in inline_admin_formsets %}
-                {% include inline_admin_formset.opts.template %}
+    {% if errors %}
+    <div class="alert alert-danger wow-alert" role="alert">
+        <h6 class="alert-heading">
+            <i class="bi bi-exclamation-triangle"></i>
+            {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </h6>
+        <ul class="mb-0">
+            {% for error in errors %}
+            <li>{{ error }}</li>
             {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger wow-alert" role="alert">
+        <h6 class="alert-heading">
+            <i class="bi bi-exclamation-triangle"></i>
+            {% blocktranslate count counter=form.non_field_errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </h6>
+        <ul class="mb-0">
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Form Content -->
+    <div class="form-container">
+        {% block field_sets %}
+        {% for fieldset in adminform %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        {% if fieldset.name %}{{ fieldset.name }}{% else %}{{ opts.verbose_name|capfirst }}{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% include "admin/includes/fieldset.html" %}
+                </div>
+            </div>
+        {% endfor %}
         {% endblock %}
-        
-        {% block after_related_objects %}{% endblock %}
-        
-        {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
-    </form>
-</div>
+
+        {% block after_field_sets %}{% endblock %}
+    </div>
+
+    {% block inline_field_sets %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    {{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% include inline_admin_formset.opts.template %}
+            </div>
+        </div>
+    {% endfor %}
+    {% endblock %}
+
+    {% block after_related_objects %}{% endblock %}
+
+    <!-- Form Actions -->
+    <div class="form-actions-container mt-4 pt-4 border-top">
+        <div class="row align-items-center">
+            <div class="col-md-6 col-12 mb-3 mb-md-0">
+                <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-outline-secondary w-100 w-md-auto">
+                    <i class="bi bi-arrow-left me-2"></i> Back to {{ opts.verbose_name_plural|capfirst }}
+                </a>
+            </div>
+            <div class="col-md-6 col-12 text-md-end">
+                {% block submit_buttons_bottom %}
+                <div class="submit-row">
+                    <input type="submit" value="{% translate 'Save' %}" class="btn btn-primary me-2" name="_save">
+                    {% if not is_popup %}
+                    <input type="submit" value="{% translate 'Save and add another' %}" class="btn btn-outline-primary me-2" name="_addanother">
+                    <input type="submit" value="{% translate 'Save and continue editing' %}" class="btn btn-outline-primary" name="_continue">
+                    {% endif %}
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</form>
 {% endblock %}

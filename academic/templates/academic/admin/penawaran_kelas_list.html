@@ -1,0 +1,118 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="wow-content-body">
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'admin:academic_kelas_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Kelas
+        </a>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+            {{ message|capfirst }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="12%">Kode Kelas</th>
+                            <th width="25%">Mata Kuliah</th>
+                            <th width="20%">Dosen</th>
+                            <th width="12%">Program Studi</th>
+                            <th width="8%">SKS</th>
+                            <th width="8%">Kuota</th>
+                            <th width="10%">Tahun Ajaran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kelas in kelas_list %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td><strong>{{ kelas.kode_kelas }}</strong></td>
+                            <td>
+                                <div>
+                                    <strong>{{ kelas.mata_kuliah.nama_mk }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ kelas.mata_kuliah.kode_mk }}</small>
+                                </div>
+                            </td>
+                            <td>{{ kelas.dosen.nama }}</td>
+                            <td>
+                                <small>{{ kelas.mata_kuliah.program_studi.nama_prodi }}</small>
+                            </td>
+                            <td class="text-center">{{ kelas.mata_kuliah.sks }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-{% if kelas.kuota > 20 %}success{% elif kelas.kuota > 10 %}warning{% else %}danger{% endif %}">
+                                    {{ kelas.kuota }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <small>
+                                    {{ kelas.tahun_ajaran }}<br>
+                                    <span class="badge bg-info">{{ kelas.semester }}</span>
+                                </small>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="bi bi-x-circle"></i>
+                                <p class="mb-0">Belum ada penawaran kelas</p>
+                                <a href="{% url 'admin:academic_kelas_add' %}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Tambah Kelas Baru
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">{{ kelas_list.count }}</h5>
+                    <p class="card-text">Total Kelas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">{{ kelas_list.count }}</h5>
+                    <p class="card-text">Kelas Aktif</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">{{ kelas_list|length }}</h5>
+                    <p class="card-text">Program Studi</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">{{ kelas_list.count }}</h5>
+                    <p class="card-text">Total Dosen</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

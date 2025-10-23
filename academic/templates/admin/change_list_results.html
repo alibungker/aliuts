@@ -1,0 +1,53 @@
+{% load i18n admin_urls admin_list %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle mb-0" id="changelist">
+        <thead class="table-light">
+            <tr>
+                {% if action_form %}<th scope="col" class="select-column">
+                    <input type="checkbox" id="action-toggle">
+                </th>{% endif %}
+                {% for header in result_headers %}
+                    <th scope="col" {{ header.class_attributtes }}>
+                        {% if header.sortable %}
+                            <a href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>
+                        {% else %}
+                            {{ header.text|capfirst }}
+                        {% endif %}
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            {% if result.form.errors %}
+                <tr>
+                    <td colspan="{{ result|length }}">{{ result.form.errors }}</td>
+                </tr>
+            {% endif %}
+            <tr class="{% if result.selected %}selected{% endif %}">
+                {% if action_form %}<td class="select-column">
+                    <input type="checkbox" class="_selected_action" name="_selected_action" value="{{ result.obj_id }}" {% if result.selected %}checked{% endif %}>
+                </td>{% endif %}
+                {% for item in result %}
+                <td {{ item.field_attributes }}>{{ item }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if results %}
+<div class="table-actions-bar">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <span class="text-muted">
+                {% blocktrans count cl.result_count as counter %}{{ counter }} {{ cl.opts.verbose_name }}{% plural %}{{ counter }} {{ cl.opts.verbose_name_plural }}{% endblocktrans %}
+            </span>
+        </div>
+        <div class="col-md-6 text-md-end">
+            {% block pagination %}{% pagination cl %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endif %}

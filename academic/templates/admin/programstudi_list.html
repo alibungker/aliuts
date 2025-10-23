@@ -1,0 +1,407 @@
+{% extends "admin/list_bootstrap.html" %}
+{% load static i18n %}
+
+{% block table_content %}
+<div class="data-table-container">
+    <!-- Enhanced Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stats-card border-start border-4 border-primary shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1 text-muted">Total Program Studi</h6>
+                            <h3 class="card-text mb-0">{{ total_prodi }}</h3>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-primary bg-opacity-10 text-primary rounded-circle p-3">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stats-card border-start border-4 border-success shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1 text-muted">Total Mahasiswa</h6>
+                            <h3 class="card-text mb-0">{{ total_students }}</h3>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-success bg-opacity-10 text-success rounded-circle p-3">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stats-card border-start border-4 border-info shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1 text-muted">Total Dosen</h6>
+                            <h3 class="card-text mb-0">{{ total_dosen }}</h3>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-info bg-opacity-10 text-info rounded-circle p-3">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stats-card border-start border-4 border-warning shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1 text-muted">Total Fakultas</h6>
+                            <h3 class="card-text mb-0">{{ fakultas_stats|length }}</h3>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-warning bg-opacity-10 text-warning rounded-circle p-3">
+                                <i class="bi bi-building"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Data Table -->
+    <div class="card shadow">
+        <div class="card-header bg-white border-bottom">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0 text-primary">
+                        <i class="bi bi-diagram-3 me-2"></i>
+                        Daftar Program Studi
+                    </h5>
+                </div>
+                <div class="col-auto">
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addProdiModal">
+                            <i class="bi bi-plus-circle me-1"></i> Add Program Studi
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="10%">Kode</th>
+                            <th width="25%">Nama Program Studi</th>
+                            <th width="15%">Fakultas</th>
+                            <th width="10%">Jenjang</th>
+                            <th width="15%">Kaprodi</th>
+                            <th width="10%">Mahasiswa</th>
+                            <th width="10%" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prodi in prodi_data %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ prodi.kode_prodi }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ prodi.nama_prodi }}</strong>
+                            </td>
+                            <td>
+                                {% if prodi.fakultas %}
+                                    <span class="badge bg-info">{{ prodi.fakultas.nama_fakultas }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Tanpa Fakultas</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ prodi.jenjang }}</span>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ prodi.kaprodi|default:'-' }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary">{{ prodi.student_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'admin:academic_programstudi_change' prodi.pk %}" class="btn btn-outline-primary btn-sm" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'admin:academic_programstudi_delete' prodi.pk %}" class="btn btn-outline-danger btn-sm" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    <p class="mb-0">Belum ada data program studi</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Program Studi Modal -->
+<div class="modal fade" id="addProdiModal" tabindex="-1" aria-labelledby="addProdiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addProdiModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add New Program Studi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Silahkan lengkapi form berikut untuk menambah program studi baru:</p>
+                <form id="quickAddForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="kode_prodi" class="form-label">Kode Program Studi *</label>
+                            <input type="text" class="form-control" id="kode_prodi" placeholder="Contoh: TI" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nama_prodi" class="form-label">Nama Program Studi *</label>
+                            <input type="text" class="form-control" id="nama_prodi" placeholder="Contoh: Teknik Informatika" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="jenjang" class="form-label">Jenjang *</label>
+                            <select class="form-control" id="jenjang" required>
+                                <option value="">Pilih Jenjang</option>
+                                <option value="D3">Diploma 3</option>
+                                <option value="S1">Sarjana</option>
+                                <option value="S2">Magister</option>
+                                <option value="S3">Doktor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kaprodi" class="form-label">Kaprodi</label>
+                            <input type="text" class="form-control" id="kaprodi" placeholder="Contoh: Dr. John Doe, M.Kom.">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Stats Cards */
+.stats-card {
+    transition: all 0.3s ease;
+    border-left-width: 4px !important;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Table Styling */
+.data-table-container .table {
+    font-size: 0.875rem;
+}
+
+.data-table-container .table th {
+    background: linear-gradient(135deg, var(--wow-primary), #3a5ba6);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+}
+
+.data-table-container .table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid var(--wow-gray-200);
+}
+
+.data-table-container .table tbody tr:hover {
+    background-color: rgba(78, 115, 223, 0.05);
+    transform: translateY(-1px);
+}
+
+/* Badge Enhancements */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    font-weight: 500;
+}
+
+/* Button Group */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Modal Enhancements */
+.modal-header.bg-primary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-control:focus {
+    border-color: var(--wow-primary);
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .stats-card .card-body {
+        padding: 1rem;
+    }
+
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .table-actions {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .table-actions .btn-group {
+        width: 100%;
+    }
+
+    .table-actions .btn-group .btn {
+        flex: 1;
+    }
+
+    .data-table-container .table {
+        font-size: 0.8rem;
+    }
+
+    .data-table-container .table th,
+    .data-table-container .table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .data-table-container .table th:nth-child(n+6),
+    .data-table-container .table td:nth-child(n+6) {
+        display: none;
+    }
+
+    .data-table-container .table th,
+    .data-table-container .table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const addModal = document.getElementById('addProdiModal');
+    const quickForm = document.getElementById('quickAddForm');
+
+    if (quickForm) {
+        quickForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Collect form data
+            const formData = new FormData(quickForm);
+
+            // Send data via fetch (you'll need to implement the actual endpoint)
+            fetch('/admin/academic/programstudi/add/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Close modal and reload page
+                    const modal = bootstrap.Modal.getInstance(addModal);
+                    modal.hide();
+                    location.reload();
+                } else {
+                    alert('Error: Failed to add program studi');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: Failed to add program studi');
+            });
+        });
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Add hover effects to rows
+    const tableRows = document.querySelectorAll('.table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(78, 115, 223, 0.05)';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,31 +1,17 @@
 from django.contrib import admin
-from .models import ProgramStudi, Dosen, Mahasiswa, MataKuliah, Kelas, KRS, Jadwal, Presensi, Nilai, Notification
+from .models import Fakultas, ProgramStudi, Dosen, Mahasiswa, MataKuliah, Kelas, KRS, Jadwal, Presensi, Nilai, Notification, Ruang, Semester
+from .admin_views import FakultasAdmin, ProgramStudiAdmin, DosenAdmin, MahasiswaAdmin, MataKuliahAdmin, RuangAdmin
 
-@admin.register(ProgramStudi)
-class ProgramStudiAdmin(admin.ModelAdmin):
-    list_display = ['kode_prodi', 'nama_prodi', 'jenjang']
-    list_filter = ['jenjang']
-    search_fields = ['kode_prodi', 'nama_prodi']
+# Register models with custom admin site
 
-@admin.register(Dosen)
-class DosenAdmin(admin.ModelAdmin):
-    list_display = ['nidn', 'nama', 'program_studi', 'jabatan', 'no_telp']
-    list_filter = ['program_studi', 'jabatan']
-    search_fields = ['nidn', 'nama', 'user__username']
-    raw_id_fields = ['user']
-
-@admin.register(Mahasiswa)
-class MahasiswaAdmin(admin.ModelAdmin):
-    list_display = ['nim', 'nama', 'program_studi', 'angkatan', 'no_telp']
-    list_filter = ['program_studi', 'angkatan']
-    search_fields = ['nim', 'nama', 'user__username']
-    raw_id_fields = ['user']
-
-@admin.register(MataKuliah)
-class MataKuliahAdmin(admin.ModelAdmin):
-    list_display = ['kode_mk', 'nama_mk', 'sks', 'program_studi', 'semester']
-    list_filter = ['program_studi', 'semester', 'sks']
-    search_fields = ['kode_mk', 'nama_mk']
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = ['kode_semester', 'nama_semester', 'tahun_ajaran', 'jenis_semester', 'tanggal_mulai', 'tanggal_selesai', 'aktif']
+    list_filter = ['jenis_semester', 'aktif', 'tahun_ajaran']
+    search_fields = ['nama_semester', 'kode_semester', 'tahun_ajaran']
+    list_editable = ['aktif']
+    date_hierarchy = 'tanggal_mulai'
+    ordering = ['-tahun_ajaran', '-jenis_semester']
 
 @admin.register(Kelas)
 class KelasAdmin(admin.ModelAdmin):
@@ -82,18 +68,4 @@ admin.site.site_header = "Sistem Informasi Akademik"
 admin.site.site_title = "SIAKAD Admin"
 admin.site.index_title = "Dashboard Administrasi Akademik"
 
-# Custom admin site with statistics
-from django.contrib.admin import AdminSite
-
-class CustomAdminSite(AdminSite):
-    def each_context(self, request):
-        context = super().each_context(request)
-        # Add statistics to context
-        context['total_mahasiswa'] = Mahasiswa.objects.count()
-        context['total_dosen'] = Dosen.objects.count()
-        context['total_kelas'] = Kelas.objects.count()
-        context['total_matakuliah'] = MataKuliah.objects.count()
-        return context
-
-# Override default admin site
-admin.site.__class__ = CustomAdminSite
+# Note: Statistics are now handled in the dashboard template

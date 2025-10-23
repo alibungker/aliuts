@@ -1,0 +1,285 @@
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<head>
+<title>{% block title %}{% endblock %}</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Wow Dashboard Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'admin/css/custom-admin.css' %}">
+
+{% block extrahead %}{% endblock %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="NONE,NOARCHIVE">
+
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
+
+<!-- Wow Dashboard Layout -->
+<div class="wow-dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="wow-sidebar" id="wowSidebar">
+        <div class="wow-sidebar-header">
+            <div class="wow-logo">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span class="wow-logo-text">SIAKAD</span>
+            </div>
+            <button class="wow-sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+
+        <div class="wow-sidebar-body">
+            <ul class="wow-nav">
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:index' %}" class="wow-nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                        <i class="bi bi-speedometer2 wow-nav-icon"></i>
+                        <span class="wow-nav-text">Dashboard</span>
+                    </a>
+                </li>
+
+                {% if has_permission %}
+                <li class="wow-nav-header">Master Data</li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_fakultas_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-building wow-nav-icon"></i>
+                        <span class="wow-nav-text">Fakultas</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_programstudi_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-diagram-3 wow-nav-icon"></i>
+                        <span class="wow-nav-text">Prodi</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_ruang_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-door-closed wow-nav-icon"></i>
+                        <span class="wow-nav-text">Ruang</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:auth_user_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-people-gear wow-nav-icon"></i>
+                        <span class="wow-nav-text">Pengguna & Peran</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_matakuliah_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-book wow-nav-icon"></i>
+                        <span class="wow-nav-text">Mata Kuliah</span>
+                    </a>
+                </li>
+
+                <li class="wow-nav-header">Akademik</li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_semester_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-calendar3 wow-nav-icon"></i>
+                        <span class="wow-nav-text">Semester</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_kelas_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-plus-circle wow-nav-icon"></i>
+                        <span class="wow-nav-text">Penawaran Kelas</span>
+                    </a>
+                </li>
+                <li class="wow-nav-item">
+                    <a href="{% url 'admin:academic_jadwal_changelist' %}" class="wow-nav-link">
+                        <i class="bi bi-clock-history wow-nav-icon"></i>
+                        <span class="wow-nav-text">Jadwal</span>
+                    </a>
+                </li>
+
+                <li class="wow-nav-header">KRS</li>
+                <li class="wow-nav-item">
+                    <a href="#" class="wow-nav-link">
+                        <i class="bi bi-card-checklist wow-nav-icon"></i>
+                        <span class="wow-nav-text">KRS</span>
+                    </a>
+                </li>
+
+                <li class="wow-nav-header">Dokumen Pribadi</li>
+                <li class="wow-nav-item">
+                    <a href="#" class="wow-nav-link">
+                        <i class="bi bi-file-text wow-nav-icon"></i>
+                        <span class="wow-nav-text">Dokumen Pribadi</span>
+                    </a>
+                </li>
+
+                <li class="wow-nav-header">Laporan</li>
+                <li class="wow-nav-item">
+                    <a href="#" class="wow-nav-link">
+                        <i class="bi bi-file-earmark-bar-graph wow-nav-icon"></i>
+                        <span class="wow-nav-text">Laporan</span>
+                    </a>
+                </li>
+
+                <li class="wow-nav-header">Pengaturan</li>
+                <li class="wow-nav-item">
+                    <a href="#" class="wow-nav-link">
+                        <i class="bi bi-gear wow-nav-icon"></i>
+                        <span class="wow-nav-text">Pengaturan</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="wow-main-wrapper">
+
+        <!-- Top Header -->
+        <header class="wow-header">
+            <div class="wow-header-left">
+                <button class="wow-header-btn" id="mobileSidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <!-- Semester Selector -->
+                <div class="semester-selector">
+                    <label for="semesterSelect" class="semester-label">Semester:</label>
+                    <select class="semester-dropdown" id="semesterSelect">
+                        <option value="2025/1" selected>2025/1</option>
+                        <option value="2024/2">2024/2</option>
+                        <option value="2024/1">2024/1</option>
+                        <option value="2023/2">2023/2</option>
+                        <option value="2023/1">2023/1</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="wow-header-right">
+                <!-- Notifications -->
+                <div class="header-icon-btn" id="notificationBtn">
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+
+                <!-- User Dropdown -->
+                <div class="wow-header-dropdown">
+                    <button class="wow-user-btn" data-bs-toggle="dropdown">
+                        <div class="wow-user-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <span class="wow-user-name">{{ user.get_short_name|default:user.username }}</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if user.has_usable_password %}
+                        <li><a class="dropdown-item" href="{% url 'admin:password_change' %}">
+                            <i class="bi bi-key"></i> {% translate 'Change password' %}
+                        </a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                            <i class="bi bi-speedometer2"></i> Admin
+                        </a></li>
+                        {% if site_url %}
+                        <li><a class="dropdown-item" href="{{ site_url }}">
+                            <i class="bi bi-globe"></i> {% translate 'View site' %}
+                        </a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right"></i> {% translate 'Log out' %}
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="wow-content">
+            {% block messages %}
+              {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show wow-alert" role="alert">
+                    {{ message|capfirst }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+              {% endif %}
+            {% endblock messages %}
+
+            <div class="wow-content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Wow Dashboard Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Wow Dashboard Custom JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar Toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+    const sidebar = document.getElementById('wowSidebar');
+
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+
+    if (mobileSidebarToggle && sidebar) {
+        mobileSidebarToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebar.classList.toggle('mobile-show');
+        });
+    }
+
+    // Close mobile sidebar when clicking outside
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 &&
+            sidebar &&
+            !sidebar.contains(e.target) &&
+            mobileSidebarToggle &&
+            !mobileSidebarToggle.contains(e.target) &&
+            sidebar.classList.contains('mobile-show')) {
+            sidebar.classList.remove('mobile-show');
+        }
+    });
+
+    // Responsive behavior
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && sidebar) {
+            sidebar.classList.remove('mobile-show');
+        }
+    });
+
+    // Initialize tooltips if any
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize dropdowns
+    const dropdownTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+    dropdownTriggerList.map(function (dropdownTriggerEl) {
+        return new bootstrap.Dropdown(dropdownTriggerEl);
+    });
+});
+</script>
+
+</body>
+</html>

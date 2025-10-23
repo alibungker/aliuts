@@ -1,551 +1,599 @@
-{% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% extends "admin/dashboard_bootstrap.html" %}
+{% load i18n static admin_urls %}
 
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    /* Dashboard Container Override */
-    .admin-main-content {
-        max-width: 100% !important;
-    }
+{% block dashboard_content %}
+<div class="dashboard-extra-content">
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-calendar3"></i> This Month
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Today</a></li>
+                    <li><a class="dropdown-item" href="#">This Week</a></li>
+                    <li><a class="dropdown-item active" href="#">This Month</a></li>
+                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addNewModal">
+                <i class="bi bi-plus-circle"></i> Add New
+            </button>
+        </div>
+    </div>
 
-    /* Welcome Banner */
-    .dashboard-welcome {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 32px 28px;
-        border-radius: 14px;
-        margin-bottom: 28px;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .dashboard-welcome::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 250px;
-        height: 250px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-    }
-
-    .dashboard-welcome h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0 0 8px 0;
-        position: relative;
-        z-index: 1;
-        line-height: 1.2;
-    }
-
-    .dashboard-welcome p {
-        font-size: 15px;
-        opacity: 0.92;
-        position: relative;
-        z-index: 1;
-        margin: 0;
-        line-height: 1.4;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-        margin-bottom: 28px;
-    }
-    
-    .stat-card {
-        background: white;
-        padding: 22px 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
-    }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    }
-    
-    .stat-card.purple { --card-color: #667eea; --card-color-light: #764ba2; }
-    .stat-card.green { --card-color: #10b981; --card-color-light: #059669; }
-    .stat-card.orange { --card-color: #f59e0b; --card-color-light: #d97706; }
-    .stat-card.blue { --card-color: #3b82f6; --card-color-light: #2563eb; }
-    
-    .stat-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 11px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
-        margin-bottom: 14px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-icon svg {
-        width: 26px;
-        height: 26px;
-        stroke: white;
-        fill: none;
-        stroke-width: 2.2;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        color: #6b7280;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        margin-bottom: 8px;
-    }
-
-    .stat-value {
-        font-size: 30px;
-        font-weight: 700;
-        color: #111827;
-        line-height: 1;
-    }
-
-    /* Modules Compact View */
-    .modules-compact {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
-    .module-compact {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e5e7eb;
-        overflow: hidden;
-        transition: all 0.25s ease;
-    }
-
-    .module-compact:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transform: translateY(-1px);
-    }
-
-    .module-compact-header {
-        background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
-        padding: 14px 18px;
-        font-size: 15px;
-        font-weight: 700;
-        color: #111827;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .module-compact-header::before {
-        content: '';
-        width: 5px;
-        height: 5px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 50%;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-    }
-
-    .module-compact-body {
-        padding: 8px 10px;
-    }
-    
-    .module-compact-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 9px 12px;
-        border-radius: 7px;
-        transition: all 0.2s ease;
-        margin-bottom: 4px;
-    }
-
-    .module-compact-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .module-compact-item:hover {
-        background: #f3f4f6;
-    }
-
-    .module-compact-item a {
-        color: #374151;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 13px;
-        flex: 1;
-    }
-
-    .module-compact-item a:hover {
-        color: #667eea;
-    }
-
-    .module-compact-actions {
-        display: flex;
-        gap: 6px;
-        flex-shrink: 0;
-    }
-
-    .module-compact-action {
-        padding: 5px 11px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .action-add {
-        background: rgba(16, 185, 129, 0.12);
-        color: #059669;
-    }
-
-    .action-add:hover {
-        background: rgba(16, 185, 129, 0.22);
-        color: #047857;
-    }
-
-    .action-change {
-        background: rgba(59, 130, 246, 0.12);
-        color: #2563eb;
-    }
-
-    .action-change:hover {
-        background: rgba(59, 130, 246, 0.22);
-        color: #1d4ed8;
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .dashboard-welcome h1 {
-            font-size: 24px;
-        }
-
-        .dashboard-welcome p {
-            font-size: 14px;
-        }
-
-        .stat-value {
-            font-size: 26px;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block breadcrumbs %}{% endblock %}
-
-{% block content %}
-<div class="admin-page-wrapper">
-    <div class="admin-main-content">
-        <div class="dashboard-container">
-            <div class="dashboard-content">
-                <div class="dashboard-welcome">
-                    <h1>👋 Selamat Datang di Admin Portal</h1>
-                    <p>Sistem Informasi Akademik - Dashboard Administrasi</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card purple">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
+    <!-- Stats Cards Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Mahasiswa</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_mahasiswa|default:"0" }}</div>
+                            <div class="text-xs text-muted mb-0">
+                                <span class="text-success mr-2"><i class="bi bi-arrow-up"></i> 12.5%</span>
+                                <span>Since last month</span>
+                            </div>
                         </div>
-                        <div class="stat-label">Total Mahasiswa</div>
-                        <div class="stat-value">{{ total_mahasiswa|default:"0" }}</div>
-                    </div>
-
-                    <div class="stat-card green">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                            </svg>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
                         </div>
-                        <div class="stat-label">Total Dosen</div>
-                        <div class="stat-value">{{ total_dosen|default:"0" }}</div>
-                    </div>
-
-                    <div class="stat-card orange">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-label">Total Kelas</div>
-                        <div class="stat-value">{{ total_kelas|default:"0" }}</div>
-                    </div>
-
-                    <div class="stat-card blue">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-label">Mata Kuliah</div>
-                        <div class="stat-value">{{ total_matakuliah|default:"0" }}</div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                {% if app_list %}
-                <div class="modules-compact">
-                    {# Tampilkan Academic app terlebih dahulu #}
-                    {% for app in app_list %}
-                        {% if "Academic" in app.name %}
-                        <div class="module-compact">
-                            <div class="module-compact-header">
-                                📚 {{ app.name }}
-                            </div>
-                            <div class="module-compact-body">
-                                {% for model in app.models %}
-                                <div class="module-compact-item">
-                                    {% if model.admin_url %}
-                                        <a href="{{ model.admin_url }}">{{ model.name }}</a>
-                                    {% else %}
-                                        <span>{{ model.name }}</span>
-                                    {% endif %}
-
-                                    <div class="module-compact-actions">
-                                        {% if model.add_url %}
-                                            <a href="{{ model.add_url }}" class="module-compact-action action-add">{% trans 'Add' %}</a>
-                                        {% endif %}
-                                        {% if model.admin_url %}
-                                            <a href="{{ model.admin_url }}" class="module-compact-action action-change">{% trans 'View' %}</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% endfor %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Dosen</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_dosen|default:"0" }}</div>
+                            <div class="text-xs text-muted mb-0">
+                                <span class="text-success mr-2"><i class="bi bi-arrow-up"></i> 3.1%</span>
+                                <span>Since last month</span>
                             </div>
                         </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    {# Kemudian tampilkan apps lainnya (Authentication, dll) #}
-                    {% for app in app_list %}
-                        {% if "Academic" not in app.name %}
-                        <div class="module-compact">
-                            <div class="module-compact-header">
-                                {% if "Authentication" in app.name %}🔐{% else %}📦{% endif %} {{ app.name }}
-                            </div>
-                            <div class="module-compact-body">
-                                {% for model in app.models %}
-                                <div class="module-compact-item">
-                                    {% if model.admin_url %}
-                                        <a href="{{ model.admin_url }}">{{ model.name }}</a>
-                                    {% else %}
-                                        <span>{{ model.name }}</span>
-                                    {% endif %}
-
-                                    <div class="module-compact-actions">
-                                        {% if model.add_url %}
-                                            <a href="{{ model.add_url }}" class="module-compact-action action-add">{% trans 'Add' %}</a>
-                                        {% endif %}
-                                        {% if model.admin_url %}
-                                            <a href="{{ model.admin_url }}" class="module-compact-action action-change">{% trans 'View' %}</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% endfor %}
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                                <i class="bi bi-person-badge"></i>
                             </div>
                         </div>
-                        {% endif %}
-                    {% endfor %}
+                    </div>
                 </div>
-                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Kelas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_kelas|default:"0" }}</div>
+                            <div class="text-xs text-muted mb-0">
+                                <span class="text-danger mr-2"><i class="bi bi-arrow-down"></i> 2.4%</span>
+                                <span>Since last month</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                                <i class="bi bi-door-open"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Mata Kuliah</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_matakuliah|default:"0" }}</div>
+                            <div class="text-xs text-muted mb-0">
+                                <span class="text-success mr-2"><i class="bi bi-arrow-up"></i> 8.7%</span>
+                                <span>Since last month</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                <i class="bi bi-book"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="admin-sidebar">
-        <div class="sidebar-section">
-            <h3>⚡ Quick Access</h3>
-            <div class="sidebar-links">
-                <!-- 📚 Academic Models -->
-                <a href="{% url 'admin:academic_dosen_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon green">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                        </svg>
-                    </div>
-                    <span>Dosens</span>
-                </a>
 
-                <a href="{% url 'admin:academic_jadwal_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon green">
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Activity Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Aktivitas Akademik</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="activityDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="activityDropdown">
+                            <a class="dropdown-item" href="#">Minggu Ini</a>
+                            <a class="dropdown-item" href="#">Bulan Ini</a>
+                            <a class="dropdown-item" href="#">Tahun Ini</a>
+                        </div>
                     </div>
-                    <span>Jadwals</span>
-                </a>
-
-                <a href="{% url 'admin:academic_kelas_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon orange">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                    </div>
-                    <span>Kelass</span>
-                </a>
-
-                <a href="{% url 'admin:academic_krs_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon purple">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                    </div>
-                    <span>Krss</span>
-                </a>
-
-                <a href="{% url 'admin:academic_mahasiswa_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon purple">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <span>Mahasiswas</span>
-                </a>
-
-                <a href="{% url 'admin:academic_matakuliah_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon blue">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                    </div>
-                    <span>Mata kuliahs</span>
-                </a>
-
-                <a href="{% url 'admin:academic_nilai_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon green">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                    </div>
-                    <span>Nilais</span>
-                </a>
-
-                <a href="{% url 'admin:academic_notification_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon red">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                    </div>
-                    <span>Notifications</span>
-                </a>
-
-                <a href="{% url 'admin:academic_presensi_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon orange">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </div>
-                    <span>Presensis</span>
-                </a>
-
-                <a href="{% url 'admin:academic_programstudi_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon blue">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        </svg>
-                    </div>
-                    <span>Program studis</span>
-                </a>
-
-                <!-- 🔐 Authentication Models -->
-                <div style="border-top: 1px solid #e5e7eb; margin: 12px 0; padding-top: 12px;">
-                    <div style="font-size: 11px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 12px;">🔐 Authentication</div>
                 </div>
-
-                <a href="{% url 'admin:auth_group_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon blue">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
+                <div class="card-body">
+                    <div class="chart-area" style="position: relative; height: 300px;">
+                        <canvas id="activityChart"></canvas>
                     </div>
-                    <span>Groups</span>
-                </a>
-
-                <a href="{% url 'admin:auth_user_changelist' %}" class="sidebar-link">
-                    <div class="sidebar-link-icon purple">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                        </svg>
-                    </div>
-                    <span>Users</span>
-                </a>
+                </div>
             </div>
         </div>
-        
-        <div class="sidebar-section">
-            <h3>📊 Statistik</h3>
-            <div class="sidebar-stats">
-                <div class="sidebar-stat purple">
-                    <div class="sidebar-stat-label">Mahasiswa</div>
-                    <div class="sidebar-stat-value">{{ total_mahasiswa|default:"0" }}</div>
+
+        <!-- Students by Major -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Mahasiswa per Program Studi</h6>
                 </div>
-                <div class="sidebar-stat green">
-                    <div class="sidebar-stat-label">Dosen</div>
-                    <div class="sidebar-stat-value">{{ total_dosen|default:"0" }}</div>
+                <div class="card-body">
+                    <div class="chart-area" style="position: relative; height: 300px;">
+                        <canvas id="majorChart"></canvas>
+                    </div>
                 </div>
-                <div class="sidebar-stat orange">
-                    <div class="sidebar-stat-label">Kelas</div>
-                    <div class="sidebar-stat-value">{{ total_kelas|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Aktivitas Terbaru</h6>
                 </div>
-                <div class="sidebar-stat blue">
-                    <div class="sidebar-stat-label">Mata Kuliah</div>
-                    <div class="sidebar-stat-value">{{ total_matakuliah|default:"0" }}</div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <!-- Timeline Item 1 -->
+                        <div class="timeline-item mb-4">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon bg-primary text-white rounded-circle shadow-sm">
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="small text-muted">2 jam yang lalu</div>
+                                    <div class="font-weight-bold">Pendaftaran Mahasiswa Baru</div>
+                                    <div class="text-muted small">Ahmad Rizki mendaftar di Teknik Informatika</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 2 -->
+                        <div class="timeline-item mb-4">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon bg-success text-white rounded-circle shadow-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="small text-muted">5 jam yang lalu</div>
+                                    <div class="font-weight-bold">Update Nilai</div>
+                                    <div class="text-muted small">Prof. Budi update nilai Algoritma</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 3 -->
+                        <div class="timeline-item mb-4">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon bg-warning text-white rounded-circle shadow-sm">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="small text-muted">1 hari yang lalu</div>
+                                    <div class="font-weight-bold">Jadwal Baru</div>
+                                    <div class="text-muted small">Kelas Matematika semester depan</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Item 4 -->
+                        <div class="timeline-item mb-0">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon bg-info text-white rounded-circle shadow-sm">
+                                    <i class="bi bi-geo-alt"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="small text-muted">2 hari yang lalu</div>
+                                    <div class="font-weight-bold">Update Ruangan</div>
+                                    <div class="text-muted small">Perubahan lokasi kelas 301A</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Aksi Cepat</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if has_permission %}
+                        <div class="col-sm-6 mb-3">
+                            <a href="{% url 'admin:academic_mahasiswa_add' %}" class="btn btn-primary btn-block">
+                                <i class="bi bi-person-plus"></i> Tambah Mahasiswa
+                            </a>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <a href="{% url 'admin:academic_dosen_add' %}" class="btn btn-success btn-block">
+                                <i class="bi bi-person-badge"></i> Tambah Dosen
+                            </a>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <a href="{% url 'admin:academic_kelas_add' %}" class="btn btn-info btn-block">
+                                <i class="bi bi-door-open"></i> Buat Kelas
+                            </a>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <a href="{% url 'admin:academic_matakuliah_add' %}" class="btn btn-warning btn-block">
+                                <i class="bi bi-book"></i> Tambah Matkul
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- System Info -->
+                    <div class="row text-center">
+                        <div class="col-4 mb-3">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Storage</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">67%</div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp 45M</div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Users</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1,423</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Management Table -->
+    {% if app_list %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 text-primary">Data Akademik</h6>
+                </div>
+                <div class="card-body p-0">
+                    {% for app in app_list %}
+                    {% if app.models %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="4" class="text-center fw-bold">{{ app.name }}</th>
+                                </tr>
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th width="40%">Nama Model</th>
+                                    <th width="35%">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for model in app.models %}
+                                {% if model.admin_url %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>
+                                        <strong>{{ model.name|title }}</strong>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ model.add_url }}" class="btn btn-success" title="Tambah {{ model.name|title }}">
+                                                <i class="bi bi-plus"></i>
+                                            </a>
+                                            <a href="{{ model.admin_url }}" class="btn btn-primary" title="Kelola {{ model.name|title }}">
+                                                <i class="bi bi-list"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+<!-- Add New Modal -->
+<div class="modal fade" id="addNewModal" tabindex="-1" role="dialog" aria-labelledby="addNewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNewModalLabel">Tambah Data Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Pilih jenis data yang ingin ditambahkan:</p>
+                <div class="list-group">
+                    {% if has_permission %}
+                    <a href="{% url 'admin:academic_mahasiswa_add' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-plus text-primary"></i> Mahasiswa Baru
+                    </a>
+                    <a href="{% url 'admin:academic_dosen_add' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-badge text-success"></i> Dosen Baru
+                    </a>
+                    <a href="{% url 'admin:academic_kelas_add' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-door-open text-info"></i> Kelas Baru
+                    </a>
+                    <a href="{% url 'admin:academic_matakuliah_add' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-book text-warning"></i> Mata Kuliah Baru
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
+
+<style>
+/* Custom Wow Dashboard Styles */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+.icon-shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.bg-primary {
+    background-color: #4e73df !important;
+}
+
+.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.bg-info {
+    background-color: #36b9cc !important;
+}
+
+.bg-warning {
+    background-color: #f6c23e !important;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+.text-success {
+    color: #1cc88a !important;
+}
+
+.text-info {
+    color: #36b9cc !important;
+}
+
+.text-warning {
+    color: #f6c23e !important;
+}
+
+/* Timeline Styles */
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 30px;
+    bottom: -20px;
+    width: 2px;
+    background-color: #e3e6f0;
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    font-size: 0.875rem;
+}
+
+/* Card Hover Effects */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Chart Container */
+.chart-area {
+    position: relative;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timeline-item {
+        padding-left: 30px;
+    }
+
+    .timeline-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 0.75rem;
+    }
+
+    .icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-600 {
+    color: #858796 !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+</style>
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activity Chart
+    var activityCtx = document.getElementById('activityChart');
+    if (activityCtx) {
+        new Chart(activityCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Pendaftaran',
+                    data: [65, 59, 80, 81, 56, 55, 70, 75, 80, 85, 90, 95],
+                    borderColor: 'rgb(78, 115, 223)',
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    tension: 0.4
+                }, {
+                    label: 'Kehadiran',
+                    data: [28, 48, 40, 59, 86, 47, 70, 65, 60, 75, 80, 85],
+                    borderColor: 'rgb(28, 200, 138)',
+                    backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Major Distribution Chart
+    var majorCtx = document.getElementById('majorChart');
+    if (majorCtx) {
+        new Chart(majorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Teknik Informatika', 'Sistem Informasi', 'Teknik Elektro', 'Matematika', 'Fisika'],
+                datasets: [{
+                    data: [320, 250, 180, 150, 120],
+                    backgroundColor: [
+                        'rgba(78, 115, 223, 0.8)',
+                        'rgba(28, 200, 138, 0.8)',
+                        'rgba(54, 185, 204, 0.8)',
+                        'rgba(246, 194, 62, 0.8)',
+                        'rgba(231, 74, 59, 0.8)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
