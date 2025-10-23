@@ -9,8 +9,8 @@ class FakultasAdmin(admin.ModelAdmin):
     list_filter = ('created_at',)
     search_fields = ('kode_fakultas', 'nama_fakultas', 'dekan')
     ordering = ('kode_fakultas',)
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def get_program_count(self, obj):
         count = obj.programstudi_set.count()
@@ -64,8 +64,8 @@ class ProgramStudiAdmin(admin.ModelAdmin):
     list_display = ('kode_prodi', 'nama_prodi', 'fakultas', 'jenjang', 'kaprodi', 'get_student_count')
     list_filter = ('fakultas', 'jenjang')
     search_fields = ('kode_prodi', 'nama_prodi', 'kaprodi')
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def get_student_count(self, obj):
         count = obj.mahasiswa_set.count()
@@ -116,8 +116,8 @@ class DosenAdmin(admin.ModelAdmin):
     list_display = ('nama', 'nidn', 'program_studi', 'jabatan', 'get_class_count')
     list_filter = ('program_studi', 'jabatan')
     search_fields = ('nama', 'nidn')
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def get_class_count(self, obj):
         count = obj.kelas_set.count()
@@ -172,8 +172,8 @@ class MahasiswaAdmin(admin.ModelAdmin):
     list_display = ('nim', 'nama', 'program_studi', 'angkatan', 'status_mahasiswa_display')
     list_filter = ('program_studi', 'angkatan', 'status_mahasiswa', 'jenis_kelamin')
     search_fields = ('nim', 'nama')
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def status_mahasiswa_display(self, obj):
         colors = {
@@ -244,8 +244,8 @@ class MataKuliahAdmin(admin.ModelAdmin):
     list_display = ('kode_mk', 'nama_mk', 'program_studi', 'sks', 'semester', 'get_class_count')
     list_filter = ('program_studi', 'semester')
     search_fields = ('kode_mk', 'nama_mk')
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def get_class_count(self, obj):
         count = obj.kelas_set.count()
@@ -318,8 +318,8 @@ class RuangAdmin(admin.ModelAdmin):
     list_display = ('kode_ruang', 'nama_ruang', 'gedung', 'lantai', 'kapasitas', 'jenis_ruang', 'status_display')
     list_filter = ('gedung', 'jenis_ruang', 'status')
     search_fields = ('kode_ruang', 'nama_ruang', 'gedung')
-    change_form_template = 'admin/form_bootstrap.html'
-    add_form_template = 'admin/form_bootstrap.html'
+    change_form_template = 'admin/change_form.html'
+    add_form_template = 'admin/change_form.html'
 
     def status_display(self, obj):
         colors = {
