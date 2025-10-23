@@ -13,9 +13,9 @@ genai.configure(api_key=GEMINI_API_KEY)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aliuts',        # Ganti
-        'USER': 'aliuts',        # Ganti
-        'PASSWORD': 'aliuts123',# Ganti
+        'NAME': '********',        # Ganti
+        'USER': '********',        # Ganti
+        'PASSWORD': '*****',# Ganti
         'HOST': 'localhost',
         'PORT': '3306',
     }
