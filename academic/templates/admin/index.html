@@ -2,5 +2,436 @@
 {% load i18n static admin_urls %}
 
 {% block dashboard_content %}
-<!-- Dashboard content has been simplified -->
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">Selamat Datang, {{ user.get_full_name|default:user.username }}</h3>
+            <p class="text-muted mb-0">Berikut adalah ringkasan sistem akademik Anda</p>
+        </div>
+        <div>
+            <span class="badge bg-primary">Semester Aktif: 2025/1</span>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Total Mahasiswa Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stats-icon bg-primary bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-people-fill text-primary fs-4"></i>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary">Aktif</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_mahasiswa|default:0 }}</h3>
+                    <p class="text-muted mb-0 small">Total Mahasiswa</p>
+                    <div class="mt-2">
+                        <small class="text-success">
+                            <i class="bi bi-arrow-up-short"></i> {{ active_students|default:0 }} Mahasiswa Aktif
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Dosen Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stats-icon bg-success bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-person-badge-fill text-success fs-4"></i>
+                        </div>
+                        <span class="badge bg-success-subtle text-success">Pengajar</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_dosen|default:0 }}</h3>
+                    <p class="text-muted mb-0 small">Total Dosen</p>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-person-workspace"></i> Dosen Aktif
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Kelas Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stats-icon bg-info bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-door-open-fill text-info fs-4"></i>
+                        </div>
+                        <span class="badge bg-info-subtle text-info">Tersedia</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_kelas|default:0 }}</h3>
+                    <p class="text-muted mb-0 small">Total Kelas</p>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar-check"></i> Semester Ini
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Program Studi Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="stats-icon bg-warning bg-opacity-10 rounded-3 p-3">
+                            <i class="bi bi-diagram-3-fill text-warning fs-4"></i>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning">Aktif</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_prodi|default:0 }}</h3>
+                    <p class="text-muted mb-0 small">Program Studi</p>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-book"></i> {{ total_matakuliah|default:0 }} Mata Kuliah
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Mahasiswa per Program Studi Chart -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="card-title mb-0">Mahasiswa per Program Studi</h5>
+                    <small class="text-muted">Distribusi mahasiswa berdasarkan program studi</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="prodiChart"></canvas>
+                    </div>
+                    {% if students_by_prodi %}
+                    <div class="mt-3 border-top pt-3">
+                        {% for prodi in students_by_prodi %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary me-2" style="width: 10px; height: 10px; padding: 0;"></span>
+                                <small>{{ prodi.nama_prodi }}</small>
+                            </div>
+                            <span class="badge bg-secondary">{{ prodi.student_count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribusi Kelas Chart -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="card-title mb-0">Kelas dengan Mahasiswa Terbanyak</h5>
+                    <small class="text-muted">Top 5 kelas berdasarkan jumlah mahasiswa</small>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="kelasChart"></canvas>
+                    </div>
+                    {% if class_distribution %}
+                    <div class="mt-3 border-top pt-3">
+                        {% for kelas in class_distribution %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <small class="fw-semibold">{{ kelas.kode_kelas }}</small>
+                                <small class="text-muted d-block">{{ kelas.mata_kuliah__nama_mk|truncatechars:30 }}</small>
+                            </div>
+                            <span class="badge bg-info">{{ kelas.student_count }}/{{ kelas.kuota }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Info Row -->
+    <div class="row g-4">
+        <!-- Quick Actions -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="card-title mb-0">Aksi Cepat</h5>
+                    <small class="text-muted">Akses cepat ke menu utama</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <a href="{% url 'admin:academic_mahasiswa_add' %}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+                                <div class="text-center">
+                                    <i class="bi bi-person-plus-fill d-block mb-2 fs-4"></i>
+                                    <span>Tambah Mahasiswa</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'admin:academic_dosen_add' %}" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+                                <div class="text-center">
+                                    <i class="bi bi-person-badge d-block mb-2 fs-4"></i>
+                                    <span>Tambah Dosen</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'admin:academic_kelas_add' %}" class="btn btn-outline-info w-100 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+                                <div class="text-center">
+                                    <i class="bi bi-door-open d-block mb-2 fs-4"></i>
+                                    <span>Buat Kelas</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'admin:academic_matakuliah_add' %}" class="btn btn-outline-warning w-100 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+                                <div class="text-center">
+                                    <i class="bi bi-book d-block mb-2 fs-4"></i>
+                                    <span>Tambah Mata Kuliah</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info & Tips -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="card-title mb-0">Informasi Sistem</h5>
+                    <small class="text-muted">Status dan informasi penting</small>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info border-0 mb-3">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+                            <div>
+                                <strong>Semester Aktif</strong>
+                                <p class="mb-0 small">Semester Ganjil 2025/2026 sedang berjalan</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 mb-2">
+                        <div>
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span class="small">Database</span>
+                        </div>
+                        <span class="badge bg-success">Terhubung</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 mb-2">
+                        <div>
+                            <i class="bi bi-person-check-fill text-primary me-2"></i>
+                            <span class="small">Mahasiswa Aktif</span>
+                        </div>
+                        <span class="badge bg-primary">{{ active_students|default:0 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 mb-2">
+                        <div>
+                            <i class="bi bi-calendar-check text-info me-2"></i>
+                            <span class="small">Kelas Dibuka</span>
+                        </div>
+                        <span class="badge bg-info">{{ total_kelas|default:0 }}</span>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Terakhir diupdate: {% now "d F Y, H:i" %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Color palette
+    const colors = {
+        primary: 'rgb(78, 115, 223)',
+        success: 'rgb(28, 200, 138)',
+        info: 'rgb(54, 185, 204)',
+        warning: 'rgb(246, 194, 62)',
+        danger: 'rgb(231, 74, 59)',
+        purple: 'rgb(108, 117, 125)',
+        indigo: 'rgb(102, 16, 242)',
+        orange: 'rgb(253, 126, 20)'
+    };
+
+    // Mahasiswa per Program Studi Chart
+    const prodiCtx = document.getElementById('prodiChart');
+    if (prodiCtx) {
+        const prodiData = {{ students_by_prodi|safe|default:"[]" }};
+
+        if (prodiData.length > 0) {
+            const labels = prodiData.map(item => item.nama_prodi);
+            const data = prodiData.map(item => item.student_count);
+
+            new Chart(prodiCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            colors.primary,
+                            colors.success,
+                            colors.info,
+                            colors.warning,
+                            colors.danger
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    }
+
+    // Distribusi Kelas Chart
+    const kelasCtx = document.getElementById('kelasChart');
+    if (kelasCtx) {
+        const kelasData = {{ class_distribution|safe|default:"[]" }};
+
+        if (kelasData.length > 0) {
+            const labels = kelasData.map(item => item.kode_kelas);
+            const data = kelasData.map(item => item.student_count);
+            const kuota = kelasData.map(item => item.kuota);
+
+            new Chart(kelasCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Mahasiswa Terdaftar',
+                            data: data,
+                            backgroundColor: colors.info,
+                            borderRadius: 8,
+                            barThickness: 40
+                        },
+                        {
+                            label: 'Kuota',
+                            data: kuota,
+                            backgroundColor: 'rgba(54, 185, 204, 0.2)',
+                            borderColor: colors.info,
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            barThickness: 40
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 5
+                            },
+                            grid: {
+                                display: true,
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+
+<style>
+.stats-card {
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-container {
+    min-height: 300px;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.badge {
+    font-weight: 500;
+}
+</style>
 {% endblock %}
