@@ -1,2 +1,5 @@
 analyze-and-report.sh
 analyze-and-report.sh
+settings.py
+settings.py.backup
+security_config.py
