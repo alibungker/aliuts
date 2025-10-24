@@ -3,78 +3,6 @@
 
 {% block table_content %}
 <div class="data-table-container">
-    <!-- Enhanced Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card stats-card border-start border-4 border-primary shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1 text-muted">Total Ruang</h6>
-                            <h3 class="card-text mb-0">{{ total_ruang }}</h3>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <div class="stats-icon bg-primary bg-opacity-10 text-primary rounded-circle p-3">
-                                <i class="bi bi-door-open"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card stats-card border-start border-4 border-success shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1 text-muted">Total Kapasitas</h6>
-                            <h3 class="card-text mb-0">{{ total_kapasitas }}</h3>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <div class="stats-icon bg-success bg-opacity-10 text-success rounded-circle p-3">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card stats-card border-start border-4 border-info shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1 text-muted">Rata-rata Kapasitas</h6>
-                            <h3 class="card-text mb-0">{{ avg_kapasitas }}</h3>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <div class="stats-icon bg-info bg-opacity-10 text-info rounded-circle p-3">
-                                <i class="bi bi-graph-up"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card stats-card border-start border-4 border-warning shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1 text-muted">Total Gedung</h6>
-                            <h3 class="card-text mb-0">{{ gedung_stats|length }}</h3>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <div class="stats-icon bg-warning bg-opacity-10 text-warning rounded-circle p-3">
-                                <i class="bi bi-building"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Enhanced Data Table -->
     <div class="card shadow">
         <div class="card-header bg-white border-bottom">
@@ -193,25 +121,6 @@
 </div>
 
 <style>
-/* Stats Cards */
-.stats-card {
-    transition: all 0.3s ease;
-    border-left-width: 4px !important;
-}
-
-.stats-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.stats-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* Table Styling */
 .data-table-container .table {
     font-size: 0.875rem;
@@ -254,15 +163,6 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    .stats-card .card-body {
-        padding: 1rem;
-    }
-
-    .stats-icon {
-        width: 40px;
-        height: 40px;
-    }
-
     .table-actions {
         width: 100%;
         margin-top: 1rem;
@@ -287,10 +187,6 @@
 }
 
 @media (max-width: 576px) {
-    .stats-card {
-        margin-bottom: 1rem;
-    }
-
     .data-table-container .table th:nth-child(n+7),
     .data-table-container .table td:nth-child(n+7) {
         display: none;

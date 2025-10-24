@@ -391,5 +391,3 @@ class RuangAdmin(admin.ModelAdmin):
         self.change_list_template = 'admin/ruang_list.html'
         return super().changelist_view(request, extra_context)
 
-# Import and register to custom admin site at the end
-from .admin_site import custom_admin_site

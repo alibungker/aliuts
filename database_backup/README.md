@@ -9,7 +9,6 @@
 
 ## Files
 - `aliuts_backup_20251025_030907.sql.gz` - Compressed backup file (65KB)
-- `aliuts_backup_20251025_030902.sql` - Uncompressed backup file (230KB)
 
 ## Backup Details
 - Complete database structure and data
@@ -19,7 +18,7 @@
 
 ## Restore Instructions
 ```bash
-# Extract if needed
+# Extract backup file
 gunzip aliuts_backup_20251025_030907.sql.gz
 
 # Restore database
