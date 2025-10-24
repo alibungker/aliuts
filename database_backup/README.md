@@ -1,8 +1,8 @@
 # Database Backup SIAKAD
+## - **Author: Muhammad Ali Murtaza/250820701100004**
 
 ## Backup Information
 - **Database Name**: aliuts
-- **Backup Date**: 2025-10-25 03:09:07 UTC
 - **MySQL/MariaDB Version**: 11.4.8-MariaDB
 - **Backup Method**: mariadb-dump with single-transaction
 - **Compression**: gzip
